@@ -1,4 +1,4 @@
-name: Sphinx docs to gh-pages
+name: Documentation
 
 on:
   release:
@@ -6,13 +6,16 @@ on:
 
   workflow_dispatch:
 
+env:
+  SPHINXWORKING: True
+
 jobs:
   sphinx_docs_to_gh-pages:
     runs-on: ubuntu-latest
     name: Sphinx docs to gh-pages
     steps:
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -21,32 +24,48 @@ jobs:
         run: |
           uname -a
 
-      - name: Make conda environment
-        uses: conda-incubator/setup-miniconda@v2    # https://github.com/conda-incubator/setup-miniconda
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.7
-          environment-file: devtools/conda-envs/docs_env.yaml
-          auto-update-conda: false
-          auto-activate-base: false
-          show-channel-urls: true
-          activate-environment: test
+          python-version: 3.12
 
-      - name: Checking gfortran version
+      - name: Setup conda env
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: devtools/conda-envs/docs_env.yaml
+          environment-name: docs
+          condarc: |
+            channels:
+              - uibcdf
+              - conda-forge
+              - ambermd
+              - defaults
+            channel_priority: strict
+          create-args: >-
+            python=3.12
+
+      - name: Info conda
+        shell: bash -l {0}
         run: |
-          gfortran --version
+          micromamba activate docs
+          micromamba info
+          micromamba list
 
       - name: Install package
-        # conda setup requires this special shell
         shell: bash -l {0}
         run: |
-           python setup.py develop
-           conda list
+          python -m pip install . --no-deps
 
-      - name: Checking version
+      - name: Test import module
         shell: bash -l {0}
         run: |
-           echo 'import openpocket; print(openpocket.__version__)' | python
+          echo "::group::Importing module from home directory"
+          cd
+          pwd
+          echo 'import pocketmt; print("Version of the package: {}".format(pocketmt.__version__))' | python
+          echo "::endgroup::"
 
       - name: Running the Sphinx to gh-pages Action
-        uses: uibcdf/action-sphinx-docs-to-gh-pages@v1.0.0
-
+        uses: uibcdf/action-sphinx-docs-to-gh-pages@v2.1.0
+        with:
+          sphinx-opts: '-j auto'

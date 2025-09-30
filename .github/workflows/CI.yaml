@@ -14,21 +14,26 @@ on:
     # Nightly tests run on master by default:
     #   Scheduled workflows run on the latest commit on the default or base branch.
     #   (from https://help.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events-schedule)
-    - cron: "0 0 * * *"
+    - cron: "0 9 * * MON"
   workflow_dispatch:
 
 jobs:
   test:
-    name: Test on ${{ matrix.os }}, Python ${{ matrix.python-version }}
-    runs-on: ${{ matrix.os }}
+    name: Test on ${{ matrix.cfg.os }}, Python ${{ matrix.cfg.python-version }}
+    runs-on: ${{ matrix.cfg.os }}
     strategy:
+      fail-fast: false  # do not cancel all in-progress jobs if any job variation fails
       matrix:
-        os: [macOS-latest, ubuntu-latest] # [macOS-latest, ubuntu-latest, windows-latest]
-        python-version: [3.7] # [3.7, 3.8, 3.9]
-
+        cfg:
+          - { os: ubuntu-latest, python-version: "3.10"}
+          - { os: ubuntu-latest, python-version: "3.11"}
+          - { os: ubuntu-latest, python-version: "3.12"}
+          - { os: macos-latest,  python-version: "3.10"}
+          - { os: macos-latest,  python-version: "3.11"}
+          - { os: macos-latest,  python-version: "3.12"}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -37,54 +42,72 @@ jobs:
       run: |
         uname -a
 
-    - name: Symlink gfortran (macOS)
-      if: runner.os == 'macOS'
-      run: |
-        sudo ln -s /usr/local/bin/gfortran-10 /usr/local/bin/gfortran
-        sudo mkdir /usr/local/gfortran
-        sudo ln -s /usr/local/Cellar/gcc@10/*/lib/gcc/10 /usr/local/gfortran/lib
-        gfortran --version
-
-    - name: Checking gfortran version
-      run: |
-        gfortran --version
-
-    # More info on options: https://github.com/conda-incubator/setup-miniconda
-    - uses: conda-incubator/setup-miniconda@v2
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ matrix.cfg.python-version }}
+
+    - name: Setup conda env
+      uses: mamba-org/setup-micromamba@v1
+      with:
         environment-file: devtools/conda-envs/test_env.yaml
+        environment-name: test
+        condarc: |
+          channels:
+            - uibcdf
+            - conda-forge
+            - ambermd
+          channel_priority: strict
 
-        #channels: conda-forge,defaults
+        create-args: >-
+          python=${{ matrix.cfg.python-version }}
 
-        activate-environment: test
-        auto-update-conda: false
-        auto-activate-base: false
-        show-channel-urls: true
-
+    - name: Info conda
+      shell: bash -l {0}
+      run: |
+        micromamba activate test
+        micromamba info
+        micromamba list
 
     - name: Install package
-
       shell: bash -l {0}
       run: |
-        python setup.py develop
-        conda list
+        python -m pip install . --no-deps
 
-    - name: Checking version
-
+    - name: Test import module
       shell: bash -l {0}
       run: |
-        echo 'import molsysmt ; print(molsysmt.__version__)' | python
+        echo "::group::Importing module from home directory"
+        cd
+        pwd
+        echo 'import pocketmt; print("Version of the package: {}".format(pocketmt.__version__))' | python
+        echo "::endgroup::"
 
     - name: Run tests
-
       shell: bash -l {0}
       run: |
-        pytest -v --cov=molsysmt --cov-report=xml --color=yes molsysmt/tests/
+        export PYTHONPATH=$PYTHONPATH:$(pwd)
+        # pytest -n logical -v --cov-config=.coveragerc --cov=pocketmt --cov-report=xml --junitxml=junit.xml --color=yes
+        pytest -v --cov-config=.coveragerc --cov=pocketmt --cov-report=xml --junitxml=junit.xml --color=yes
 
-    - name: CodeCov
-      uses: codecov/codecov-action@v1
+    - name: Check coverage
+      shell: bash -l {0}
+      run: |
+        cat ./coverage.xml
+
+    - name: Upload coverage reports to Codecov
+      if: matrix.cfg.os == 'ubuntu-latest' && matrix.cfg.python-version == '3.12'
+      uses: codecov/codecov-action@v4
       with:
+        verbose: true
         file: ./coverage.xml
         flags: unittests
-        name: codecov-${{ matrix.os }}-py${{ matrix.python-version }}
+        name: codecov-${{ matrix.cfg.os }}-py${{ matrix.cfg.python-version }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Upload test results to Codecov
+      if: matrix.cfg.os == 'ubuntu-latest' && matrix.cfg.python-version == '3.12' && ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+
