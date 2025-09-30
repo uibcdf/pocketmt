@@ -1,0 +1,18 @@
+channels:
+- uibcdf
+- conda-forge
+- defaults
+dependencies:
+- python
+- setuptools
+- numpy
+- pyunitwizard
+- scipy
+- nglview
+- molsysmt
+- sphinx
+- pydata-sphinx-theme
+- sphinxcontrib-bibtex
+- myst-nb
+- sphinx-copybutton
+- sphinx-remove-toctrees

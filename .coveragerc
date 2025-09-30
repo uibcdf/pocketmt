@@ -1,0 +1,11 @@
+# .coveragerc
+
+[run]
+branch = True
+source = pocketmt
+
+[report]
+show_missing = True
+omit =
+    pocketmt/_private/**
+
