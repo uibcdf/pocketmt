@@ -10,9 +10,13 @@ dependencies:
 - scipy
 - nglview
 - molsysmt
+- jupyterlab
 - sphinx
 - pydata-sphinx-theme
 - sphinxcontrib-bibtex
-- myst-nb
-- sphinx-copybutton
 - sphinx-remove-toctrees
+- sphinx-copybutton
+- sphinx-design
+- sphinx-favicon
+- sphinx-tabs
+- myst-nb
