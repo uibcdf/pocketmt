@@ -2,7 +2,7 @@
 Unit to test the AlphaSpheres class
 """
 
-import openpocket as opoc
+import pocketmt as pom
 import pytest
 import numpy as np
 
@@ -15,7 +15,7 @@ def test_alphaspheres_original_points():
                [ 0.,  0.,  0.],
                [-1., -1.,  0.]])
 
-    alphaspheres = opoc.alpha_spheres.AlphaSpheres(points)
+    alphaspheres = pom.alpha_spheres.AlphaSpheres(points)
 
     assert np.allclose(points, alphaspheres.points)
 

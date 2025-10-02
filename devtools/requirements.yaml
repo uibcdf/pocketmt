@@ -2,7 +2,6 @@ setup:
   channels: &setup_channels
     - uibcdf
     - conda-forge
-    - defaults
   dependencies: &setup_dependencies
     - python
     - setuptools
