@@ -1,0 +1,21 @@
+pocketmt.alpha\_spheres package
+===============================
+
+Submodules
+----------
+
+pocketmt.alpha\_spheres.alpha\_spheres module
+---------------------------------------------
+
+.. automodule:: pocketmt.alpha_spheres.alpha_spheres
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: pocketmt.alpha_spheres
+   :members:
+   :show-inheritance:
+   :undoc-members:

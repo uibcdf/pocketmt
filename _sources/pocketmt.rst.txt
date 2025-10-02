@@ -1,0 +1,29 @@
+pocketmt package
+================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pocketmt.alpha_spheres
+
+Submodules
+----------
+
+pocketmt.get\_pockets module
+----------------------------
+
+.. automodule:: pocketmt.get_pockets
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: pocketmt
+   :members:
+   :show-inheritance:
+   :undoc-members:
