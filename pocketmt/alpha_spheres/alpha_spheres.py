@@ -1,3 +1,4 @@
+from pocketmt import pyunitwizard as puw
 import numpy as np
 from scipy.spatial import Voronoi
 from scipy.spatial.distance import euclidean
@@ -59,12 +60,21 @@ class AlphaSpheres():
 
             # Checking if the argument points fulfills requirements
 
-            if isinstance(points, (list, tuple)):
-                points = np.array(points)
-            elif isinstance(points, np.ndarray):
-                pass
+            if puw.is_quantity(points):
+                if puw.check(coordinates, dimensionality={'[L]':1}):
+
+                    points_values, points_unit = puw.get_value_and_unit(points)
+
+                else:
+                    raise ValueError("The argument points needs to be a numpy array with shape (n_points, 3) and length
+                                     units")
             else:
-                raise ValueError("The argument points needs to be a numpy array with shape (n_points, 3)")
+                if isinstance(points, (list, tuple)):
+                    points = np.array(points)
+                elif isinstance(points, np.ndarray):
+                    pass
+                else:
+                    raise ValueError("The argument points needs to be a numpy array with shape (n_points, 3)")
 
             if (len(points.shape)!=2) and (points.shape[1]!=3):
                 raise ValueError("The argument points needs to be a numpy array with shape (n_points, 3)")

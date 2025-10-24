@@ -4,18 +4,19 @@ setup:
     - conda-forge
   dependencies: &setup_dependencies
     - python
-    - setuptools
-    - numpy
+    - pip
+    - setuptools >=61.0
+    - versioningit ~=2.0
 
 production:
   channels: &production_channels
     - *setup_channels
   dependencies: &production_dependencies
     - *setup_dependencies
+    - molsysmt
     - pyunitwizard
     - scipy
     - nglview
-    - molsysmt
 
 test:
   channels: &test_channels
@@ -23,8 +24,8 @@ test:
   dependencies: &test_dependencies
     - *production_dependencies
     - pytest
-    - pip
     - pytest-cov
+    - pytest-xdist
     - codecov
 
 docs:

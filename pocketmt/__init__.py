@@ -6,9 +6,17 @@ Short description
 # versioningit
 from ._version import __version__
 
+def __print_version__():
+    print("PocketMT version " + __version__)
+
+from . import config
+config.setup_logging(level="WARNING", capture_warnings=True, simplify_warning_format=True)
+
+from ._pyunitwizard import pyunitwizard
+
 from . import alpha_spheres
+from .get_alpha_spheres import get_alpha_spheres
 from .get_pockets import get_pockets, show_pockets
 
-#__documentation_web__ = 'https://www.uibcdf.org/OPocket'
-#__github_web__ = 'https://github.com/uibcdf/OPocket'
-#__github_issues_web__ = __github_web__ + '/issues'
+__all__ = []
+
