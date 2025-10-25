@@ -1,15 +1,26 @@
-class Pocket():
+from .Cavity import Cavity
 
-    def __init__(self, atom_indices=None, index=None, id=None):
+class Pocket(Cavity):
 
-        self.atom_indices = atom_indices
-        self.index = index
-        self.id = id
-        self.n_mouths = None
-        self.solvent_accessible_area = None
-        self.solvent_accessible_volume = None
-        self.molecular_surface_area = None
-        self.molecular_surface_volume = None
-        self.length = None
-        self.corner_points_count = None
+    def __init__(self, atom_indices=None, mouth_index=None, index=None, id=None,
+                 shape_index=None, shape_id=None, feature_index=None, feature_id=None):
+        super().__init__(atom_indices=atom_indices, mouth_indices=[mouth_index], n_mouths=1,
+                         feature_index=feature_index, feature_id=feature_id, shape_index=shape_index, shape_id=shape_id,
+                         type_index=index, type_id=id)
+        self.feature_type = "pocket"
 
+    @property
+    def index(self):
+        return self.type_index
+
+    @id.setter
+    def index(self, value):
+        self.type_index = value
+
+    @property
+    def id(self):
+        return self.type_id
+
+    @id.setter
+    def id(self, value):
+        self.type_id = value

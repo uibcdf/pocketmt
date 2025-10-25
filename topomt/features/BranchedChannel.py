@@ -1,13 +1,13 @@
-from .Boundary import Boundary
+from .Cavity import Cavity
 
-class Mouth(Boundary):
+class BranchedChannel(Cavity):
 
-    def __init__(self, atom_indices=None, index=None, id=None,
+    def __init__(self, atom_indices=None, mouth_indices=None, n_mouths=None, index=None, id=None,
                  shape_index=None, shape_id=None, feature_index=None, feature_id=None):
-        super().__init__(atom_indices=atom_indices,
+        super().__init__(atom_indices=atom_indices, mouth_indices=mouth_indices, n_mouths=n_mouths,
                          feature_index=feature_index, feature_id=feature_id, shape_index=shape_index, shape_id=shape_id,
                          type_index=index, type_id=id)
-        self.feature_type = "mouth"
+        self.feature_type = "branched_channel"
 
     @property
     def index(self):
