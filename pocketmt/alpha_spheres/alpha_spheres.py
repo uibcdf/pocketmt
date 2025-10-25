@@ -66,8 +66,7 @@ class AlphaSpheres():
                     points_values, points_unit = puw.get_value_and_unit(points)
 
                 else:
-                    raise ValueError("The argument points needs to be a numpy array with shape (n_points, 3) and length
-                                     units")
+                    raise ValueError("The argument points needs to be a numpy array with shape (n_points, 3) and length units")
             else:
                 if isinstance(points, (list, tuple)):
                     points = np.array(points)
