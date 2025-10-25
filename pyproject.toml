@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 # Self-descriptive entries which should always be present
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata/
 [project]
-name = "pocketmt"
+name = "topomt"
 description = "A short description of the project"
 dynamic = ["version"]
 readme = "README.md"
@@ -25,8 +25,8 @@ dependencies = [
 
 # Update the urls once the hosting is set up.
 [project.urls]
-"Source" = "https://github.com/uibcdf/pocketmt/"
-"Documentation" = "https://uibcdf.org/pocketmt/"
+"Source" = "https://github.com/uibcdf/topomt/"
+"Documentation" = "https://uibcdf.org/topomt/"
 
 [project.optional-dependencies]
 test = [
@@ -82,7 +82,7 @@ match = ["*"]
 default-tag = "1.0.0"
 
 [tool.versioningit.write]
-file = "pocketmt/_version.py"
+file = "topomt/_version.py"
 
 #[tool.flit.external-data]
 #directory = "data"

@@ -20,17 +20,17 @@ import sys
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-import pocketmt
+import topomt
 
 # -- Project information -----------------------------------------------------
 
-project = 'PocketMT'
+project = 'TopoMT'
 copyright = ''
 
 # The short X.Y version
-version = pocketmt.__version__.split('+')[0]
+version = topomt.__version__.split('+')[0]
 # The full version, including alpha/beta/rc tags
-release = pocketmt.__version__.split('+')[0]
+release = topomt.__version__.split('+')[0]
 
 print(f'version {version}, release {release}')
 
@@ -154,7 +154,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/uibcdf/pocketmt",
+            "url": "https://github.com/uibcdf/topomt",
             "icon": "fa-brands fa-github",
         },
     ],
@@ -164,7 +164,7 @@ html_theme_options = {
 
 html_context = {
     "github_user": "uibcdf",
-    "github_repo": "pocketmt",
+    "github_repo": "topomt",
     "github_version": "main",
     "doc_path": "docs",
 }
@@ -203,7 +203,7 @@ def setup(app):
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pocketmtdoc'
+htmlhelp_basename = 'topomtdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------

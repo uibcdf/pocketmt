@@ -1,5 +1,5 @@
 """
-PocketMT
+TopoMT
 Short description
 """
 
@@ -7,7 +7,7 @@ Short description
 from ._version import __version__
 
 def __print_version__():
-    print("PocketMT version " + __version__)
+    print("TopoMT version " + __version__)
 
 from . import config
 config.setup_logging(level="WARNING", capture_warnings=True, simplify_warning_format=True)

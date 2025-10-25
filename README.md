@@ -1,5 +1,5 @@
-# PocketMT
+# TopoMT
 
-A Pocket MultiToolkit designed to simplify and streamline the detection,
-analysis, and characterization of protein pockets, cavities, channels, and
-binding sites.
+Molecular Topography Multi Toolkit is a Python library for the
+detection, representation and analysis of molecular surface topography,
+including pockets, cavities, channels, interfaces, grooves and protrusions.

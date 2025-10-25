@@ -3,13 +3,13 @@
 set -euo pipefail
 
 # ------------------------------------------------------------------------------
-# PocketMT development bootstrap with activation switch & flexible path discovery
+# TopoMT development bootstrap with activation switch & flexible path discovery
 # - Creates/updates an environment from development_env.yaml
-# - Installs PocketMT in editable mode (no deps)
+# - Installs TopoMT in editable mode (no deps)
 # - Optional Jupyter kernel registration
 # - Supports overriding Python version
 # - Auto-discovers development_env.yaml regardless of current working directory:
-#     * parent-of-repo, repo root, pocketmt/, or devtools/
+#     * parent-of-repo, repo root, topomt/, or devtools/
 #
 # Usage examples:
 #   bash devtools/start_dev.sh --mode print
@@ -21,7 +21,7 @@ set -euo pipefail
 # - By default the script reads Python version from the YAML; --python overrides it.
 # ------------------------------------------------------------------------------
 
-ENV_NAME="pocketmt"
+ENV_NAME="topomt"
 MODE="print"                    # 'print' (default) or 'persist'
 PYTHON_VERSION=""
 REGISTER_KERNEL=${REGISTER_KERNEL:-"1"}
@@ -45,11 +45,11 @@ Options:
       Override Python version (e.g. 3.11, 3.12). If omitted, YAML decides.
 
   --env-name <name>
-      Environment name (default: pocketmt)
+      Environment name (default: topomt)
 
   --env-yaml <path>
       Path to the YAML file. If omitted, the script auto-discovers it
-      (works when called from parent-of-repo, repo root, pocketmt/, or devtools/).
+      (works when called from parent-of-repo, repo root, topomt/, or devtools/).
 
   --no-kernel
       Skip Jupyter kernel registration (same as REGISTER_KERNEL=0)
@@ -112,14 +112,14 @@ REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 # --- Auto-discover ENV_YAML ----------------------------------------------------
 # Candidate locations from *current working directory*
 CWD_CANDIDATES=(
-  "pocketmt/devtools/conda-envs/development_env.yaml"
+  "topomt/devtools/conda-envs/development_env.yaml"
   "devtools/conda-envs/development_env.yaml"
   "conda-envs/development_env.yaml"
 )
 
 # Candidate locations from the *script location* (most robust)
 SCRIPT_CANDIDATES=(
-  "${REPO_ROOT}/pocketmt/devtools/conda-envs/development_env.yaml"
+  "${REPO_ROOT}/topomt/devtools/conda-envs/development_env.yaml"
   "${SCRIPT_DIR}/conda-envs/development_env.yaml"
   "${REPO_ROOT}/devtools/conda-envs/development_env.yaml"
 )
@@ -211,13 +211,13 @@ else
 fi
 
 # --- Editable install -----------------------------------------------------------
-echo "[setup] Installing PocketMT in editable mode (no deps)..."
+echo "[setup] Installing TopoMT in editable mode (no deps)..."
 ${RUN} python -m pip install --no-deps --editable .
 
 # --- Optional kernel registration ----------------------------------------------
 if [[ "${REGISTER_KERNEL}" == "1" ]]; then
-  echo "[setup] Registering Jupyter kernel 'Python (pocketmt)'..."
-  ${RUN} python -m ipykernel install --user --name "${ENV_NAME}" --display-name "Python (pocketmt)"
+  echo "[setup] Registering Jupyter kernel 'Python (topomt)'..."
+  ${RUN} python -m ipykernel install --user --name "${ENV_NAME}" --display-name "Python (topomt)"
 fi
 
 # --- Diagnostics ----------------------------------------------------------------
