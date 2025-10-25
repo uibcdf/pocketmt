@@ -2,9 +2,9 @@
 <svg
    version="1.1"
    id="svg2"
-   viewBox="0 0 2496.7212 530.32675"
-   height="14.967cm"
-   width="70.462997cm"
+   viewBox="0 0 2038.8549 549.3543"
+   height="15.504cm"
+   width="57.541cm"
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
    sodipodi:docname="logo.svg"
    inkscape:export-filename="logo.png"
@@ -36,18 +36,24 @@
      fit-margin-right="1.5"
      fit-margin-bottom="1.5"
      inkscape:zoom="0.36388287"
-     inkscape:cx="1739.5708"
-     inkscape:cy="416.34276"
+     inkscape:cx="1365.8241"
+     inkscape:cy="380.61698"
      inkscape:window-x="1920"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g71262"
+     inkscape:current-layer="g70941"
      inkscape:pagecheckerboard="0"
      inkscape:document-units="cm"
      inkscape:showpageshadow="0"
      inkscape:deskcolor="#d1d1d1" />
   <defs
      id="defs4">
+    <rect
+       x="1251.7664"
+       y="900.60315"
+       width="479.6452"
+       height="675.55267"
+       id="rect302" />
     <linearGradient
        inkscape:collect="always"
        id="linearGradient60818">
@@ -147,7 +153,7 @@
        fy="751.98877"
        r="52.525475"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.4001391,0,0,1.4001391,901.3966,-278.21167)" />
+       gradientTransform="matrix(1.4001391,0,0,1.4001391,320.1466,-559.46167)" />
     <radialGradient
        inkscape:collect="always"
        xlink:href="#linearGradient57616"
@@ -158,7 +164,7 @@
        fy="452.91687"
        r="53.149605"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.4024753,0,0,1.4024753,-366.1075,-59.39864)" />
+       gradientTransform="matrix(1.4024753,0,0,1.4024753,-221.7325,163.72639)" />
     <radialGradient
        inkscape:collect="always"
        xlink:href="#linearGradient60818"
@@ -169,7 +175,7 @@
        fy="440.59293"
        r="52.525475"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.4028729,0,0,1.4028729,-1594.147,186.19692)" />
+       gradientTransform="matrix(1.4028729,0,0,1.4028729,-1356.022,-126.92808)" />
   </defs>
   <metadata
      id="metadata7">
@@ -183,27 +189,28 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(-113.87722,-381.27618)"
+     transform="translate(-147.20793,-417.48116)"
      id="layer1">
     <g
        id="g70941">
       <g
-         id="g71262">
+         id="g71262"
+         transform="translate(20.625001,18.750001)">
         <circle
            r="73.66568"
-           cy="575.80609"
-           cx="1246.8274"
+           cy="798.93109"
+           cx="1391.2024"
            id="path4164-6-7-5-3-0"
            style="fill:url(#radialGradient57620);fill-opacity:1;stroke:none;stroke-width:1.73929;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
         <circle
            r="73.686562"
-           cy="804.29272"
-           cx="1838.8301"
+           cy="491.16772"
+           cx="2076.9551"
            id="path4164-6-7-5-3-7"
            style="fill:url(#radialGradient60820);fill-opacity:1;stroke:none;stroke-width:1.75115;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
         <ellipse
-           cy="774.67719"
-           cx="999.69128"
+           cy="493.42719"
+           cx="418.44128"
            id="path4164-6-7-5-5-92"
            style="fill:url(#radialGradient55610);fill-opacity:1;stroke:none;stroke-width:1.74774;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            rx="73.523842"
@@ -215,9 +222,14 @@
            style="font-style:normal;font-weight:normal;font-size:529.134px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3341);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><tspan
              x="222.60156"
              y="558.94001"
-             id="tspan341"><tspan
+             id="tspan349"><tspan
                style="font-family:'Varela Round';-inkscape-font-specification:'Varela Round'"
-               id="tspan339">PocketMT</tspan></tspan></text>
+               id="tspan347">TopoMT</tspan></tspan></text>
+        <text
+           xml:space="preserve"
+           transform="matrix(0.93750013,0,0,0.93750013,113.87722,381.27618)"
+           id="text300"
+           style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect302);fill:#000000;fill-opacity:1;stroke:none" />
       </g>
     </g>
   </g>
