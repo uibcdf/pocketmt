@@ -1,13 +1,13 @@
 from .Boundary import Boundary
 
-class BaseRim(Boundary):
+class Ridge(Boundary):
 
     def __init__(self, atom_indices=None, index=None, id=None,
                  shape_index=None, shape_id=None, feature_index=None, feature_id=None):
         super().__init__(atom_indices=atom_indices,
                          feature_index=feature_index, feature_id=feature_id, shape_index=shape_index, shape_id=shape_id,
                          type_index=index, type_id=id)
-        self.feature_type = "base_rim"
+        self.feature_type = "ridge"
 
     @property
     def index(self):
@@ -25,14 +25,3 @@ class BaseRim(Boundary):
     def id(self, value):
         self.type_id = value
 
-    def length(self):
-        pass
-
-    def perimeter(self):
-        pass
-
-    def center(self):
-        pass
-
-    def normal(self):
-        pass
