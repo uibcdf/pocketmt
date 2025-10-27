@@ -63,17 +63,6 @@ These attributes are intended to be the **core structural descriptors** used for
 
 ---
 
-## 🔐 Notes
-
-- These attributes are **pure geometry**, with no energetic or dynamic information.  
-- They are **designed for deterministic reproducibility**: same structure → same attributes.  
-- They support a **topographic graph** interpretation:
-  - 0D = nodes,
-  - 1D = edges,
-  - 2D = faces.
-- Energetic information (hotspots, binding energies, dynamics) should live in a **separate annotation layer**, not in the geometry model.
-
----
 
 ## 🧭 Recommended Usage
 

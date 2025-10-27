@@ -86,20 +86,15 @@ To be considered for future inclusion:
 
 > `shape_type = point`. Points are anchored to compatible Feature2Ds.
 
-| 0D Point | Dim | Applies to 2D shape types | Geometric role / use |
-|----------|-----|----------------------------|----------------------|
-| Pit      | 0   | concavity                  | Deepest point (local minimum) of concavity. |
-| Apex     | 0   | convexity                  | Tip (local maximum) of convexity. |
-
 | 0D Point     | Dim | Applies to shape types         | Geometric role                                | Typical Biological / Pharmacological Use |
 |--------------|-----|-------------------------------|-----------------------------------------------|------------------------------------------|
 | Pit          | 0   | concavity                     | Local minimum of concavity                    | Hotspot candidate, anchor site. |
 | Nadir        | 0   | concavity                     | Global minimum of a concavity                 | Key anchoring site. |
 | Apex         | 0   | convexity                     | Local maximum of convexity                    | Epitope candidate. |
-Summit	0	convexity	Global maximum of a convexity (highest point)	Salient epitope apex, prime anchor for binder design
-| Bifurcation  | 0   | concavity, mixed              | Junction point of branching pathways         | Transport path topology. |
-| SaddlePoint  | 0   | mixed                         | Point of zero mean curvature in saddle patch | Mechanical leverage point. |
-| RidgeTip     | 0   | convexity                     | Tip along a ridge                            | Protrusive epitope geometry. |
+| Summit       | 0	 | convexity                     | Global maximum of a convexity (highest point) | Salient epitope apex, prime anchor for binder design
+| Bifurcation  | 0   | concavity, mixed              | Junction point of branching pathways          | Transport path topology. |
+| SaddlePoint  | 0   | mixed                         | Point of zero mean curvature in saddle patch  | Mechanical leverage point. |
+| RidgeTip     | 0   | convexity                     | Tip along a ridge                             | Protrusive epitope geometry. |
 
 
 ---
