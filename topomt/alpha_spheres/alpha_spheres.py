@@ -1,4 +1,4 @@
-from pocketmt import pyunitwizard as puw
+from topomt import pyunitwizard as puw
 import numpy as np
 from scipy.spatial import Voronoi
 from scipy.spatial.distance import euclidean

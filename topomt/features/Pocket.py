@@ -13,7 +13,7 @@ class Pocket(Cavity):
     def index(self):
         return self.type_index
 
-    @id.setter
+    @index.setter
     def index(self, value):
         self.type_index = value
 

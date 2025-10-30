@@ -1,11 +1,10 @@
-# 🧭 TopoMT — Feature Attributes Catalog (v1)
+# TopoMT — Feature Attributes Catalog
 
 This document defines **purely geometric, energy-agnostic attributes** for each **feature dimensionality class (0D / 1D / 2D)** in the TopoMT topographic model.  
 These attributes are intended to be the **core structural descriptors** used for indexing, ranking, graph construction, and machine learning applications.
 
----
 
-## 📍 0D Features — `Feature0D` (points)
+## 0D Features — (points)
 
 | Attribute                | Type / Unit                        | Description                                                                                         | Notes |
 |---------------------------|-------------------------------------|-----------------------------------------------------------------------------------------------------|-------|
@@ -20,7 +19,7 @@ These attributes are intended to be the **core structural descriptors** used for
 
 ---
 
-## 🪵 1D Features — `Feature1D` (boundaries)
+## 1D Features — (boundaries)
 
 | Attribute                | Type / Unit                        | Description                                                                                             | Notes |
 |---------------------------|-------------------------------------|---------------------------------------------------------------------------------------------------------|-------|
@@ -39,7 +38,7 @@ These attributes are intended to be the **core structural descriptors** used for
 
 ---
 
-## 🌀 2D Features — `Feature2D` (shape surfaces)
+## 2D Features — (shape surfaces)
 
 | Attribute                  | Type / Unit                       | Description                                                                                                            | Notes |
 |----------------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------|-------|
@@ -61,13 +60,3 @@ These attributes are intended to be the **core structural descriptors** used for
 | `genus_or_holes`          | int                                 | Topological genus or number of holes in the surface.                                                                   | Optional advanced descriptor. |
 | `hierarchy_level`         | int                                 | Depth in topographic hierarchy (e.g., channel branch depth).                                                           | Optional for traversal. |
 
----
-
-
-## 🧭 Recommended Usage
-
-- **Pharmacophore placement** along boundaries and points using `geodesic_position` and `coordinates`.
-- **Site ranking** using curvature, depth/height, openness, or connectivity indices.
-- **Docking seed generation** based on 0D critical points (pit/apex) and boundary loops.
-- **Geometric filtering** of molecular pathways using length/width and branching features of 1D elements.
-- **Graph analysis** of molecular landscapes using connectivity between features across dimensions.

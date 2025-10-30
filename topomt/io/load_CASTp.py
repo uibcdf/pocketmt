@@ -1,5 +1,5 @@
 import os
-from pocketmt import pyunitwizard as puw
+from topomt import pyunitwizard as puw
 import molsysmt as msm
 
 def load_CASTp(poc_file=None, pocInfo_file=None, mouth_file=None, mouthInfo_file=None, pdb_file=None,
@@ -30,7 +30,7 @@ def load_CASTp(poc_file=None, pocInfo_file=None, mouth_file=None, mouthInfo_file
             elif aux_file.endswith('.pdb'):
                 pdb_file = os.path.join(dir_path, aux_file)
 
-    from pocketmt import Topography, Pocket, Mouth
+    from tmt import Topograpy
 
     topography = Topography()
 

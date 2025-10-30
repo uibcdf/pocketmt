@@ -24,7 +24,7 @@ class Vexity(Feature):
     def index(self):
         return self.shape_index
 
-    @id.setter
+    @index.setter
     def index(self, value):
         self.shape_index = value
 

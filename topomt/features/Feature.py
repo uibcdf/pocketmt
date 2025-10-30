@@ -39,7 +39,7 @@ class Feature():
     def index(self):
         return self.feature_index
 
-    @id.setter
+    @index.setter
     def index(self, value):
         self.feature_index = value
 
