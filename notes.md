@@ -176,3 +176,70 @@ parents_of(child) y children_of(parent) son consistentes”).
 Fuzz tests de serialización/deserialización y round-trip.
 
 CI: mypy/pyright + ruff/black/isort + pytest (coverage).
+
+
+---------
+
+
+8) Respuestas a dudas típicas (que ya salieron en tu revisión)
+
+¿Qué pinta Pydantic aquí?
+Nada obligatorio. El diseño usa Protocol (structural typing) + dataclasses. Si más adelante quieres validación de datos a nivel de objeto (tipos, coerciones, defaults, serialización), puedes añadir Pydantic (modelos), pero no es requisito del core. El contrato del sistema es el Protocolo, no una clase base. 
+
+Topography
+
+TypeAlias y Protocol en Python ≥3.10
+Sí, son idiomáticos para tipado moderno. Protocol acopla muy bien con duck typing y librerías científicas donde no quieres jerarquías rígidas. TypeAlias documenta la intención y mejora legibilidad. 
+
+Topography
+
+from __future__ import annotations
+En 3.10+ no siempre es imprescindible, pero sigue siendo buena práctica por forward references y perf/costos de import, sobre todo en módulos que se referencian mutuamente (aquí hay importaciones perezosas para evitar ciclos). 
+
+Topography
+
+9) Buenas prácticas científicas que ya incorpora (y qué considerar después)
+
+Ya presente:
+
+Tipado moderno con Literal, Protocol, TypeAlias y runtime checkable para depuración.
+
+Separación clara de modelo (Topography), validación de reglas (validators) y vistas/colecciones.
+
+Índices derivados coherentes para consultas eficientes y API de alto nivel expresiva. 
+
+Topography
+
+ 
+
+validators
+
+ 
+
+collections_views
+
+A considerar más adelante (cuando toque):
+
+Serialización (p.ej., a JSON/MessagePack) y round-trip.
+
+Inmutabilidad parcial para estados “congelados” (snapshots).
+
+Hooks para undo/redo o transactions al registrar/enlazar.
+
+Integración con numpy/pandas si buscas bulk ops o dumps tabulares.
+
+Validaciones de geometría métrica (esto es ontología; la métrica quedaría fuera por diseño y encaja en otro módulo).
+
+10) Mini checklist mental al usarlo
+
+¿Mi objeto cumple el protocolo correcto (0D/1D/2D)?
+
+¿shape_type y dimensionality son coherentes?
+
+¿Definí applies_to en 1D/0D cuando deseo restringir enlaces?
+
+¿type_index es único dentro de su feature_type? (el registro lo hace cumplir).
+
+¿Mis enlaces 1D/0D→2D respetan las reglas especiales (mouth, base_rim, seam)? 
+
+validators
