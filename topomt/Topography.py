@@ -1,6 +1,3 @@
-# Topography.py
-# TopoMT — Registry and hybrid view system with modern typing (Python >= 3.10)
-
 from __future__ import annotations
 
 from dataclasses import dataclass, field

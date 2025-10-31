@@ -75,3 +75,104 @@ SurfaceNode	Nodo de la malla de superficie o alpha-shape asociado a un feature
 SurfaceEdge / SurfaceFace	Elementos geométricos de triangulación
 Void (alias interno)	sinónimo de cavity cerrada sin bocas — útil para compatibilidad con CASTp
 
+----------------
+
+1) Tipado y contratos
+
+Enums o StrEnum (3.11) para shape_type y quizá feature_type en el runtime,
+manteniendo Literal[...] para los type-checkers. Esto te da validación en
+tiempo de ejecución sin perder precisión estática.
+
+Final para constantes (claves de diccionario como "concavity_types"), evitando reasignaciones accidentales.
+
+TypedDict (o Protocol adicional) si data u otros blobs de metadatos tienen estructura conocida.
+
+Mypy/pyright “strict-ish”: activa flags como warn-unused-ignores,
+no_implicit_optional, disallow-any-generics, etc. (mejora la robustez con coste
+bajo).
+
+2) Modelo de datos y mutabilidad
+
+@dataclass(slots=True) en Topography para reducir huella de memoria y acelerar
+attribute access (útil con muchos features).
+
+Inmutabilidad selectiva: considera congelar (frozen=True) algunos campos de
+features (al menos feature_id, feature_type, shape_type, dimensionality,
+type_index) y dejar mutables solo los contenedores (boundary_ids, point_ids).
+Esto mantiene integridad sin sacrificar ergonomía.
+
+Read-only views extra: además de tuple, si expones mapas (p.ej. una vista
+pública de by_type_index), usa types.MappingProxyType para asegurar
+inmutabilidad externa.
+
+3) Errores y validación
+
+Excepciones específicas: define una jerarquía (TopoMTError, DuplicateIDError,
+TypeIndexConflict, ShapeCompatibilityError, …). Mejora el manejo aguas arriba y
+los mensajes.
+
+Chequeos de invariantes (método validate() en Topography):
+
+Unicidad de feature_id.
+
+Unicidad de (feature_type, type_index).
+
+Coherencia de relaciones (parents_of/children_of, y que boundary_ids/point_ids existan solo en 2D).
+
+Modo estricto opcional (flag de entorno o parámetro): en estricto, convierte
+warnings en errores o ejecuta validaciones adicionales (útil en CI).
+
+4) Rendimiento y escalabilidad
+
+Compresión de índices: si el volumen crece, puedes mapear feature_type y
+shape_type a enteros (tablas de símbolos) internamente; tu API seguiría usando
+strings/Enums, pero reduces memoria y aceleras lookups.
+
+Batch ops: añade register_many(iterable) y link_many(pairs) para minimizar overhead en cargas grandes.
+
+Perfilado básico: un microbenchmark de register/link/of_type con 1e5 features para detectar cuellos (dict growth, GC).
+
+5) Concurrencia y seguridad de hilo
+
+Si prevés uso concurrente, añade un RLock interno y decóralo en
+register/link/mutadores. Expón en docs que las vistas devueltas son
+instantáneas (snapshot) no “live”.
+
+6) Extensibilidad y plugins
+
+Sistema de “entry points” (via importlib.metadata.entry_points) para registrar
+tipos de features desde paquetes externos (plugins). Tu Topography podría
+consumir un catalog loader y poblar catalog.
+
+Hooks: callbacks opcionales (on_register, on_link) para auditar, loggear o construir índices secundarios.
+
+7) Serialización y E/S
+
+Define un formato estable: to_dict()/from_dict() para Topography y features,
+más to_json() (o msgspec/orjson si te importa el rendimiento).
+
+Versiona el esquema (campo schema_version) para migraciones futuras.
+
+8) Logging y trazabilidad
+
+Integra logging (ya lo trabajaste en otros proyectos): canaliza avisos de
+compatibilidad, enlaces redundantes, etc., con niveles (INFO, WARNING, ERROR) y
+un Logger de módulo.
+
+9) Documentación y DX
+
+Docstrings NumPy + ejemplos de uso (registro, link, consultas por tipo).
+
+Sphinx: página “Architecture & Invariants”, “Extending with new feature types”, y “Performance tips”.
+
+Type-directed docs: los TypeAlias y Protocol ya facilitan que la docs auto-generada sea clara.
+
+10) Testing
+
+Tests de propiedades con Hypothesis (p.ej., “si registras N features con
+(type,type_index) únicos, nunca deben colisionar”; “si haces link válido,
+parents_of(child) y children_of(parent) son consistentes”).
+
+Fuzz tests de serialización/deserialización y round-trip.
+
+CI: mypy/pyright + ruff/black/isort + pytest (coverage).
