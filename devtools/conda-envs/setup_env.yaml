@@ -1,8 +1,8 @@
 channels:
 - uibcdf
 - conda-forge
-- defaults
 dependencies:
 - python
-- setuptools
-- numpy
+- pip
+- setuptools >=61.0
+- versioningit ~=2.0

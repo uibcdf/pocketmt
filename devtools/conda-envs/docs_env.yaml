@@ -1,16 +1,18 @@
 channels:
 - uibcdf
 - conda-forge
-- defaults
 dependencies:
 - python
-- setuptools
-- numpy
+- pip
+- setuptools >=61.0
+- versioningit ~=2.0
+- molsysmt
 - pyunitwizard
 - scipy
 - nglview
-- molsysmt
 - jupyterlab
+- plantuml
+- graphviz
 - sphinx
 - pydata-sphinx-theme
 - sphinxcontrib-bibtex
@@ -19,4 +21,5 @@ dependencies:
 - sphinx-design
 - sphinx-favicon
 - sphinx-tabs
+- sphinxcontrib-plantuml
 - myst-nb

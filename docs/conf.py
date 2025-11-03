@@ -59,6 +59,7 @@ extensions = [
     'sphinx_remove_toctrees',
     'sphinx_design',
     'sphinx_favicon',
+    'sphinxcontrib.plantuml',
     'myst_nb',
     'sphinx_tabs.tabs', # Do not move from the last position
 ]
@@ -68,6 +69,7 @@ extensions = [
 
 myst_enable_extensions = [
     'dollarmath',
+    'deflist',
     'amsmath',
     'colon_fence'
 ]
@@ -137,6 +139,10 @@ remove_from_toctrees = []
 for directory in os.walk('api'):
     if directory[0].endswith('/autosummary'):
         remove_from_toctrees.append(directory[0]+'/*')
+
+## --PlantUML configuration
+plantuml = "plantuml"
+plantuml_output_format = "svg" # o "java -jar /ruta/plantuml.jar"
 
 # -- Options for HTML output -------------------------------------------------
 
