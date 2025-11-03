@@ -30,4 +30,5 @@ MDpocket utilities: the fpocket2 manual ships a small Python script (createMDPoc
 fpocket.sourceforge.net
 +1
 
+PockDrug: https://pockdrug.rpbs.univ-paris-diderot.fr/cgi-bin/index.py?page=home
 
