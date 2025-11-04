@@ -248,28 +248,27 @@ def load_CASTp(
             topography.molecular_system = molecular_system
         elif pdb_path is not None:
             _ensure_exists(pdb_path, "PDB file")
-            msm = _import_molsysmt()
-            topography.molecular_system = msm.convert(str(pdb_path), to_form="molsysmt.MolSys")
+            topography.molecular_system = str(pdb_path)
         elif poc_path is not None or mouth_path is not None:
             raise ValueError(
                 "A molecular_system or a PDB file is required to locate atom indices for CASTp data."
             )
 
-        molecular_system_obj = getattr(topography, "molecular_system", None)
+        molsys_obj = topography.molsys
 
         pocket_atoms: dict[int, list[int]] = {}
         if poc_path is not None:
             _ensure_exists(poc_path, "CASTp .poc file")
-            if molecular_system_obj is None:
+            if molsys_obj is None:
                 raise ValueError("A molecular system is required to interpret the .poc file.")
-            pocket_atoms = _parse_castp_atom_file(poc_path, "POC", molecular_system_obj)
+            pocket_atoms = _parse_castp_atom_file(poc_path, "POC", molsys_obj)
 
         mouth_atoms: dict[int, list[int]] = {}
         if mouth_path is not None:
             _ensure_exists(mouth_path, "CASTp .mouth file")
-            if molecular_system_obj is None:
+            if molsys_obj is None:
                 raise ValueError("A molecular system is required to interpret the .mouth file.")
-            mouth_atoms = _parse_castp_atom_file(mouth_path, "M4P", molecular_system_obj)
+            mouth_atoms = _parse_castp_atom_file(mouth_path, "M4P", molsys_obj)
 
         pocket_info: dict[int, dict[str, Any]] = {}
         if poc_info_path is not None:

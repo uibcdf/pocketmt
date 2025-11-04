@@ -48,12 +48,57 @@ class _DummyTopology:
         return matches
 
 
-class _DummyMolecularSystem:
+class _DummyMolSys:
     def __init__(self, atoms: Iterable[_DummyAtom]) -> None:
         self.topology = _DummyTopology(atoms)
 
 
-class _PocketStub:
+_DummyMolSys.__name__ = "MolSys"  # type: ignore[attr-defined]
+_DummyMolSys.__module__ = "molsysmt.native"  # type: ignore[attr-defined]
+
+
+class _FeatureStubBase:
+    feature_type: str
+    shape_type: str
+    dimensionality: int
+
+    def __init__(self) -> None:
+        self._topography: topomt.Topography | None = None
+
+    @property
+    def topography(self) -> topomt.Topography | None:
+        return self._topography
+
+    @topography.setter
+    def topography(self, value: topomt.Topography | None) -> None:
+        self._topography = value
+
+    @property
+    def molecular_system(self):
+        if self._topography is None:
+            return None
+        return self._topography.molecular_system
+
+    @molecular_system.setter
+    def molecular_system(self, value) -> None:
+        if self._topography is None:
+            raise AttributeError("Feature is not associated with any topography")
+        self._topography.molecular_system = value
+
+    @property
+    def molsys(self):
+        if self._topography is None:
+            return None
+        return self._topography.molsys
+
+    @molsys.setter
+    def molsys(self, value) -> None:
+        if self._topography is None:
+            raise AttributeError("Feature is not associated with any topography")
+        self._topography.molsys = value
+
+
+class _PocketStub(_FeatureStubBase):
     feature_type = "pocket"
     shape_type = "concavity"
     dimensionality = 2
@@ -70,6 +115,7 @@ class _PocketStub:
         feature_index: int | None = None,
         feature_id: str | None = None,
     ) -> None:
+        super().__init__()
         self.atom_indices = list(atom_indices or [])
         self.feature_id = feature_id
         self.feature_index = feature_index
@@ -95,7 +141,7 @@ class _PocketStub:
         self.id = id
 
 
-class _MouthStub:
+class _MouthStub(_FeatureStubBase):
     feature_type = "mouth"
     shape_type = "boundary"
     dimensionality = 1
@@ -111,6 +157,7 @@ class _MouthStub:
         feature_index: int | None = None,
         feature_id: str | None = None,
     ) -> None:
+        super().__init__()
         self.atom_indices = list(atom_indices or [])
         self.feature_id = feature_id
         self.feature_index = feature_index
@@ -129,7 +176,7 @@ class _MouthStub:
         self.id = id
 
 
-def _build_molecular_system_from_pdb(pdb_path: Path) -> _DummyMolecularSystem:
+def _build_molecular_system_from_pdb(pdb_path: Path) -> _DummyMolSys:
     atoms: list[_DummyAtom] = []
     with pdb_path.open(encoding="utf-8") as handle:
         for line in handle:
@@ -144,7 +191,7 @@ def _build_molecular_system_from_pdb(pdb_path: Path) -> _DummyMolecularSystem:
                     chain_id=line[21].strip(),
                 )
             )
-    return _DummyMolecularSystem(atoms)
+    return _DummyMolSys(atoms)
 
 
 @pytest.fixture
@@ -174,6 +221,15 @@ def patched_load_castp(monkeypatch: pytest.MonkeyPatch):
         return _build_molecular_system_from_pdb(Path(path))
 
     fake_module = SimpleNamespace(convert=_fake_convert)
+    def _fake_molsys_converter(system):
+        if system is None:
+            return None
+        if isinstance(system, _DummyMolSys):
+            return system
+        return _build_molecular_system_from_pdb(Path(system))
+
+    monkeypatch.setattr(topomt.Topography, "default_molsys_converter", _fake_molsys_converter, raising=False)
+    monkeypatch.setattr(module.Topography, "default_molsys_converter", _fake_molsys_converter, raising=False)
     monkeypatch.setattr(module, "_import_molsysmt", lambda: fake_module)
     monkeypatch.setattr(module, "msm", fake_module, raising=False)
     return module
@@ -266,6 +322,11 @@ def test_load_castp_directory_and_zip(castp_dataset: dict[str, Path], patched_lo
     assert len(topo_from_zip.pockets) == 78
     assert len(topo_from_zip.mouths) == 42
 
+    assert topo_from_dir.molecular_system == str(castp_dataset["1tcd.pdb"])
+    assert isinstance(topo_from_dir.molsys, _DummyMolSys)
+    assert Path(topo_from_zip.molecular_system).name == "1tcd.pdb"
+    assert isinstance(topo_from_zip.molsys, _DummyMolSys)
+
     expected_pockets = _read_pocket_info(castp_dataset["1tcd.pocInfo"])
     expected_mouths = _read_mouth_info(castp_dataset["1tcd.mouthInfo"])
     expected_pocket_to_mouths = _invert_pocket_mapping(expected_mouths)
@@ -275,6 +336,11 @@ def test_load_castp_directory_and_zip(castp_dataset: dict[str, Path], patched_lo
         pocket_dir = topo_from_dir.get_by_id(feature_id)
         pocket_zip = topo_from_zip.get_by_id(feature_id)
         info = expected_pockets[pocket_id]
+
+        assert pocket_dir.molecular_system == topo_from_dir.molecular_system
+        assert pocket_dir.molsys is topo_from_dir.molsys
+        assert pocket_zip.molecular_system == topo_from_zip.molecular_system
+        assert pocket_zip.molsys is topo_from_zip.molsys
 
         assert _quantity_value(pocket_dir.solvent_accessible_area, "angstroms**2") == pytest.approx(info["area_sa"])
         assert _quantity_value(pocket_dir.molecular_surface_area, "angstroms**2") == pytest.approx(info["area_ms"])
@@ -303,6 +369,11 @@ def test_load_castp_directory_and_zip(castp_dataset: dict[str, Path], patched_lo
         mouth_dir = topo_from_dir.get_by_id(feature_id)
         mouth_zip = topo_from_zip.get_by_id(feature_id)
         info = expected_mouths[mouth_id]
+
+        assert mouth_dir.molecular_system == topo_from_dir.molecular_system
+        assert mouth_dir.molsys is topo_from_dir.molsys
+        assert mouth_zip.molecular_system == topo_from_zip.molecular_system
+        assert mouth_zip.molsys is topo_from_zip.molsys
 
         assert _quantity_value(mouth_dir.solvent_accessible_area, "angstroms**2") == pytest.approx(info["area_sa"])
         assert _quantity_value(mouth_dir.molecular_surface_area, "angstroms**2") == pytest.approx(info["area_ms"])
