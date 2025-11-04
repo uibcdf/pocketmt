@@ -2,7 +2,7 @@
 Unit to test the AlphaSpheres class
 """
 
-import pocketmt as pom
+import topomt as pom
 import pytest
 import numpy as np
 
