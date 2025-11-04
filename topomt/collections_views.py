@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import Any
-from Topography import TypeCollection  # uses lazy import on Topography side for families
+from .type_collections import TypeCollection
 
 
 class _BaseFamilyCollection:

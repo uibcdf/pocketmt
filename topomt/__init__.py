@@ -14,7 +14,7 @@ config.setup_logging(level="WARNING", capture_warnings=True, simplify_warning_fo
 
 from ._pyunitwizard import pyunitwizard
 
-from .Topography import Topography
+from .topography.Topography import Topography
 from . import features
 from . import alpha_spheres
 
@@ -23,5 +23,5 @@ from .get_pockets import get_pockets, show_pockets
 
 from . import io
 
-__all__ = []
+__all__ = ["Topography",]
 

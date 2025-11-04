@@ -2,7 +2,7 @@ def _dimensionality_from_shape_type(shape_type):
 
     if shape_type in ["boundary"]:
         return 1
-    elif shape_type in ["cavity", "convexity", "mixed"]:
+    elif shape_type in ["concavity", "convexity", "mixed"]:
         return 2
     else:
         return None
@@ -23,6 +23,8 @@ class Feature():
         self.type_index = type_index
         self.type_id = type_id
         self.dimensionality = _dimensionality_from_shape_type(shape_type)
+        self.boundary_ids = []
+        self.point_ids = []
 
     def __repr__(self):
         return f"<Feature feature_index={self.feature_index} feature_type={self.feature_type} type_index={self.type_index} type_id={self.type_id}>"

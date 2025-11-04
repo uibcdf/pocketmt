@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from typing import Any
-from Topography import BaseFeature, Feature0D, Feature1D, Feature2D, ShapeType
+from .base_types import BaseFeature, Feature0D, Feature1D, Feature2D, ShapeType
 
 
 def _shape(feat: BaseFeature) -> str:
