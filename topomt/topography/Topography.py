@@ -14,26 +14,6 @@ from typing import Any
 import molsysmt as msm
 
 
-def _is_molsys_instance(candidate: Any) -> bool:
-    if candidate is None:
-        return False
-    try:
-        return bool(msm.basic._is_molsysmt_MolSys_form(candidate))
-    except Exception:
-        pass
-
-    cls = candidate.__class__
-    name = getattr(cls, "__name__", "")
-    module = getattr(cls, "__module__", "")
-    if name == "MolSys" and module.startswith("molsysmt"):
-        return True
-
-    try:
-        return msm.get_form(candidate) == "molsysmt.MolSys"
-    except Exception:
-        return False
-
-
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Main class
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -111,7 +91,7 @@ class Topography(Mapping[int, BaseFeature]):
             self._molsys = None
             return
 
-        if _is_molsys_instance(value):
+        if msm.form.molsysmt_MolSys.is_form(value):
             molsys = value
         else:
             molsys = msm.convert(value, to_form="molsysmt.MolSys")
@@ -126,14 +106,14 @@ class Topography(Mapping[int, BaseFeature]):
     @molsys.setter
     def molsys(self, value: Any | None) -> None:
         if value is None:
-            if _is_molsys_instance(self._molecular_system):
+            if msm.form.molsysmt_MolSys.is_form(self._molecular_system):
                 self._molecular_system = None
             self._molsys = None
             return
-        if not _is_molsys_instance(value):
+        if not msm.form.molsysmt_MolSys.is_form(value):
             raise TypeError("Topography.molsys must be a 'molsysmt.MolSys' instance.")
         self._molsys = value
-        if self._molecular_system is None or _is_molsys_instance(self._molecular_system):
+        if self._molecular_system is None or msm.form.molsysmt_MolSys.is_form(self._molecular_system):
             self._molecular_system = value
 
     def _ensure_index_from_id(self, feature_id: FeatureID) -> FeatureIndex:

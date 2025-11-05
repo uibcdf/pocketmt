@@ -6,7 +6,7 @@ from typing import Any
 
 from topomt import pyunitwizard as puw
 from topomt.features import Mouth, Pocket
-from topomt.topography import Topography
+from topomt.topography.Topography import Topography
 
 
 def _import_molsysmt() -> Any:
