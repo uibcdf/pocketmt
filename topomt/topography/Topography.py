@@ -57,6 +57,8 @@ class Topography(Mapping[int, BaseFeature]):
     def __init__(
         self,
         catalog: dict[str, list[str]] | None = None,
+        *,
+        molsys_converter: Callable[[Any | None], Any | None] | None = None,
     ) -> None:
         # main store: index → feature
         self._by_index: dict[FeatureIndex, BaseFeature] = {}
@@ -90,6 +92,9 @@ class Topography(Mapping[int, BaseFeature]):
         # molecular system references
         self._molecular_system: Any | None = None
         self._molsys: Any | None = None
+        self._molsys_converter: Callable[[Any | None], Any | None] = (
+            molsys_converter or type(self).default_molsys_converter
+        )
 
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     # Mapping interface (index → feature)
