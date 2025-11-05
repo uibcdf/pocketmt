@@ -208,10 +208,11 @@ def castp_dataset(tmp_path: Path) -> dict[str, Path]:
     files["dir"] = dataset_dir
     return files
 
-
 @pytest.fixture
 def patched_load_castp(monkeypatch: pytest.MonkeyPatch):
     module = importlib.import_module("topomt.io.load_CASTp")
+
+    # seguimos usando la Topography real (ya sin molsys_converter)
     monkeypatch.setattr(module, "Topography", topomt.Topography)
     monkeypatch.setattr(module, "Pocket", _PocketStub)
     monkeypatch.setattr(module, "Mouth", _MouthStub)
@@ -221,18 +222,41 @@ def patched_load_castp(monkeypatch: pytest.MonkeyPatch):
         return _build_molecular_system_from_pdb(Path(path))
 
     fake_module = SimpleNamespace(convert=_fake_convert)
-    def _fake_molsys_converter(system):
-        if system is None:
-            return None
-        if isinstance(system, _DummyMolSys):
-            return system
-        return _build_molecular_system_from_pdb(Path(system))
 
-    monkeypatch.setattr(topomt.Topography, "default_molsys_converter", _fake_molsys_converter, raising=False)
-    monkeypatch.setattr(module.Topography, "default_molsys_converter", _fake_molsys_converter, raising=False)
+    # 1) el loader usará este msm falso
     monkeypatch.setattr(module, "_import_molsysmt", lambda: fake_module)
     monkeypatch.setattr(module, "msm", fake_module, raising=False)
+
+    # 2) y la Topography también debe usarlo: parcheamos el módulo donde está definida
+    topo_mod = importlib.import_module(topomt.Topography.__module__)
+    monkeypatch.setattr(topo_mod, "msm", fake_module, raising=False)
+
     return module
+
+#@pytest.fixture
+#def patched_load_castp(monkeypatch: pytest.MonkeyPatch):
+#    module = importlib.import_module("topomt.io.load_CASTp")
+#    monkeypatch.setattr(module, "Topography", topomt.Topography)
+#    monkeypatch.setattr(module, "Pocket", _PocketStub)
+#    monkeypatch.setattr(module, "Mouth", _MouthStub)
+#
+#    def _fake_convert(path: str | Path, *, to_form: str | None = None):
+#        assert to_form == "molsysmt.MolSys"
+#        return _build_molecular_system_from_pdb(Path(path))
+#
+#    fake_module = SimpleNamespace(convert=_fake_convert)
+#    def _fake_molsys_converter(system):
+#        if system is None:
+#            return None
+#        if isinstance(system, _DummyMolSys):
+#            return system
+#        return _build_molecular_system_from_pdb(Path(system))
+#
+#    monkeypatch.setattr(topomt.Topography, "default_molsys_converter", _fake_molsys_converter, raising=False)
+#    monkeypatch.setattr(module.Topography, "default_molsys_converter", _fake_molsys_converter, raising=False)
+#    monkeypatch.setattr(module, "_import_molsysmt", lambda: fake_module)
+#    monkeypatch.setattr(module, "msm", fake_module, raising=False)
+#    return module
 
 
 def _quantity_value(quantity, unit: str) -> float | None:
