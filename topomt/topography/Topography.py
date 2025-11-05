@@ -10,7 +10,7 @@ from .base_types import (
 from .type_collections import TypeCollection
 from collections.abc import Mapping, Iterator
 from .validators import validate_parent_child_compat, validate_special_rules
-from typing import Any, Callable
+from typing import Any
 import molsysmt as msm
 
 
@@ -126,7 +126,7 @@ class Topography(Mapping[int, BaseFeature]):
             self._molecular_system = None
             self._molsys = None
             return
-        molsys = self._molsys_converter(value)
+        molsys = type(self).default_molsys_converter(value)
         self._molecular_system = value
         self._molsys = molsys
 
