@@ -11,25 +11,14 @@ from .type_collections import TypeCollection
 from collections.abc import Mapping, Iterator
 from .validators import validate_parent_child_compat, validate_special_rules
 from typing import Any, Callable, ClassVar
-
-
-def _import_molsysmt() -> Any:
-    try:
-        import molsysmt as msm  # type: ignore
-    except ImportError as exc:  # pragma: no cover - executed only when dependency missing
-        raise ImportError(
-            "The 'molsysmt' package is required to convert molecular systems into 'molsysmt.MolSys'. "
-            "Install it with 'pip install molsysmt'."
-        ) from exc
-    return msm
+import molsysmt as msm
 
 
 def _is_molsys_instance(candidate: Any) -> bool:
-    cls = candidate.__class__
-    name = getattr(cls, "__name__", "")
-    module = getattr(cls, "__module__", "")
-    return name == "MolSys" and module.startswith("molsysmt")
-
+    try:
+        return msm.basic._is_molsysmt_MolSys_form(candidate) # To be implemented in the future
+    except:
+        return msm.get_form(candidate)=="molsysmt.MolSys"
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
