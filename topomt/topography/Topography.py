@@ -10,15 +10,28 @@ from .base_types import (
 from .type_collections import TypeCollection
 from collections.abc import Mapping, Iterator
 from .validators import validate_parent_child_compat, validate_special_rules
-from typing import Any, Callable, ClassVar
+from typing import Any, Callable
 import molsysmt as msm
 
 
 def _is_molsys_instance(candidate: Any) -> bool:
+    if candidate is None:
+        return False
     try:
-        return msm.basic._is_molsysmt_MolSys_form(candidate) # To be implemented in the future
-    except:
-        return msm.get_form(candidate)=="molsysmt.MolSys"
+        return bool(msm.basic._is_molsysmt_MolSys_form(candidate))
+    except Exception:
+        pass
+
+    cls = candidate.__class__
+    name = getattr(cls, "__name__", "")
+    module = getattr(cls, "__module__", "")
+    if name == "MolSys" and module.startswith("molsysmt"):
+        return True
+
+    try:
+        return msm.get_form(candidate) == "molsysmt.MolSys"
+    except Exception:
+        return False
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -33,9 +46,19 @@ class Topography(Mapping[int, BaseFeature]):
     Internal storage and relations use *feature_index* for efficiency.
     """
 
+    @staticmethod
+    def default_molsys_converter(molecular_system: Any | None) -> Any | None:
+        if molecular_system is None:
+            return None
+        if _is_molsys_instance(molecular_system):
+            return molecular_system
+        return msm.convert(molecular_system, to_form="molsysmt.MolSys")
+
     def __init__(
         self,
         catalog: dict[str, list[str]] | None = None,
+        *,
+        molsys_converter: Callable[[Any | None], Any | None] | None = None,
     ) -> None:
         # main store: index → feature
         self._by_index: dict[FeatureIndex, BaseFeature] = {}
@@ -69,6 +92,9 @@ class Topography(Mapping[int, BaseFeature]):
         # molecular system references
         self._molecular_system: Any | None = None
         self._molsys: Any | None = None
+        self._molsys_converter: Callable[[Any | None], Any | None] = (
+            molsys_converter or type(self).default_molsys_converter
+        )
 
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     # Mapping interface (index → feature)
@@ -100,7 +126,7 @@ class Topography(Mapping[int, BaseFeature]):
             self._molecular_system = None
             self._molsys = None
             return
-        molsys = msm.convert(value, to_form='molsysmt.MolSys')
+        molsys = self._molsys_converter(value)
         self._molecular_system = value
         self._molsys = molsys
 
