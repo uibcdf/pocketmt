@@ -47,7 +47,6 @@ class Topography(Mapping[int, BaseFeature]):
     def __init__(
         self,
         catalog: dict[str, list[str]] | None = None,
-        *,
     ) -> None:
         # main store: index → feature
         self._by_index: dict[FeatureIndex, BaseFeature] = {}
