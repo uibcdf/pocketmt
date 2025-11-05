@@ -1,3 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from topomt.topography.Topography import Topography
+
+
 def _dimensionality_from_shape_type(shape_type):
 
     if shape_type in ["boundary"]:
@@ -25,6 +33,7 @@ class Feature():
         self.dimensionality = _dimensionality_from_shape_type(shape_type)
         self.boundary_ids = []
         self.point_ids = []
+        self._topography: Topography | None = None
 
     def __repr__(self):
         return f"<Feature feature_index={self.feature_index} feature_type={self.feature_type} type_index={self.type_index} type_id={self.type_id}>"
@@ -52,4 +61,36 @@ class Feature():
     @id.setter
     def id(self, value):
         self.feature_id = value
+
+    @property
+    def topography(self) -> Topography | None:
+        return self._topography
+
+    @topography.setter
+    def topography(self, value: Topography | None) -> None:
+        self._topography = value
+
+    @property
+    def molecular_system(self) -> Any | None:
+        if self._topography is None:
+            return None
+        return self._topography.molecular_system
+
+    @molecular_system.setter
+    def molecular_system(self, value: Any | None) -> None:
+        if self._topography is None:
+            raise AttributeError("Feature is not associated with any topography")
+        self._topography.molecular_system = value
+
+    @property
+    def molsys(self) -> Any | None:
+        if self._topography is None:
+            return None
+        return self._topography.molsys
+
+    @molsys.setter
+    def molsys(self, value: Any | None) -> None:
+        if self._topography is None:
+            raise AttributeError("Feature is not associated with any topography")
+        self._topography.molsys = value
 
