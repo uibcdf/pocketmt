@@ -31,14 +31,6 @@ def _is_molsys_instance(candidate: Any) -> bool:
     return name == "MolSys" and module.startswith("molsysmt")
 
 
-def _default_molsys_converter(molecular_system: Any | None) -> Any | None:
-    if molecular_system is None:
-        return None
-    if _is_molsys_instance(molecular_system):
-        return molecular_system
-    msm = _import_molsysmt()
-    return msm.convert(molecular_system, to_form="molsysmt.MolSys")
-
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Main class
@@ -52,13 +44,10 @@ class Topography(Mapping[int, BaseFeature]):
     Internal storage and relations use *feature_index* for efficiency.
     """
 
-    default_molsys_converter: ClassVar[Callable[[Any | None], Any | None]] = _default_molsys_converter
-
     def __init__(
         self,
         catalog: dict[str, list[str]] | None = None,
         *,
-        molsys_converter: Callable[[Any | None], Any | None] | None = None,
     ) -> None:
         # main store: index → feature
         self._by_index: dict[FeatureIndex, BaseFeature] = {}
@@ -92,9 +81,6 @@ class Topography(Mapping[int, BaseFeature]):
         # molecular system references
         self._molecular_system: Any | None = None
         self._molsys: Any | None = None
-        self._molsys_converter: Callable[[Any | None], Any | None] = (
-            molsys_converter or self.default_molsys_converter
-        )
 
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     # Mapping interface (index → feature)
@@ -126,7 +112,7 @@ class Topography(Mapping[int, BaseFeature]):
             self._molecular_system = None
             self._molsys = None
             return
-        molsys = self._molsys_converter(value)
+        molsys = msm.convert(value, to_form='molsysmt.MolSys')
         self._molecular_system = value
         self._molsys = molsys
 
