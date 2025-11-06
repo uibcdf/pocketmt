@@ -58,19 +58,25 @@ Additional `AGENTS.md` files may exist in submodules with specialized instructio
 
 ### 3.1 Dependencies
 
-Key dependencies:
+Key/Core dependencies:
 
 | Package | Purpose |
 |---------|---------|
-| MolSysMT | Core dependency. Provides molecular system representation,
+| MolSysMT | Provides molecular system representation,
 topology access, selection, and format conversions. TopoMT builds directly on
 MolSysMT data structures and relies on its API for atom-level and surface-level
 analysis.|
+| PyUnitWizard | Handles physical units and conversions.|
 | NumPy | Numerical computations |
 | SciPy | Scientific computing |
+| NGLview | Molecular visualization |
 | pytest | Testing framework |
 | Sphinx | Documentation generation |
-| NGLview | Molecular visualization |
+
+### 3.2 Python Versions supported
+
+TopoMT is developed and tested for **Python 3.10, 3.11 and 3.12**.
+Taking advantage of the latest language features and type hinting improvements for that versions.
 
 ---
 
@@ -141,6 +147,19 @@ analysis.|
 - Avoid hardcoding sensitive information in code or logs.  
 - Do not report or share secrets, credentials, or environment variables in **issues**, **PRs**, or any communication channel.  
 
+### 4.10 String and Quotation Style
+
+Follow these conventions for quotation marks and string formatting.
+
+- Use **single quotes (`'`)** for strings by default.
+- Use **double quotes (`"`)** only when the string itself contains an apostrophe.
+- Use **triple double quotes (`"""`)** for **docstrings**, both for modules and functions.
+- Use double quotes (") when the string itself contains a single quote/apostrophe 
+or when double quotes make the string clearer to read. Readability beats blind
+consistency.
+- When a string already uses double quotes inside, you can define it with single quotes outside.
+- When embedding JSON or other data formats that require double quotes by specification, preserve their native quoting style.
+
 ---
 
 ## 5. Testing Guidelines
@@ -167,6 +186,12 @@ analysis.|
 - Update documentation after API or behavior changes.  
 - Validate generated docs before merging (`make html`).  
 - Do not include private or experimental code in public docs.
+
+## 6.1 Docstring Style
+
+- Always use **PEP 257-compliant** docstrings (`"""Triple double quotes"""`).
+- Write the first line as a concise summary, followed by a blank line, then a more detailed description if needed.
+
 
 ---
 
@@ -272,5 +297,29 @@ To be extended in future versions, it may include:
 - After any change, verify if any `AGENTS.md` or `README.md` need to be updated for consistency.  
 - Regularly review CI configurations for dependency or policy drift.  
 - Keep this file synchronized across UIBCDF projects when possible.  
+
+---
+
+## 10. Formatting Tools
+
+- All repositories are formatted automatically with **Black** using:
+
+  ```toml
+  [tool.black]
+  line-length = 88
+  skip-string-normalization = false
+  ```
+
+  This configuration enforces **single quotes** by default and ensures consistent formatting across the ecosystem.
+
+- Contributors should run:
+
+  ```bash
+  black .
+  isort .
+  flake8
+  ```
+
+  before submitting any pull request.
 
 ---

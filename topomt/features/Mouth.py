@@ -1,26 +1,8 @@
-from .Boundary import Boundary
+from .Feature1D import Feature1D
 
-class Mouth(Boundary):
+class Mouth(Feature1D):
 
-    def __init__(self, atom_indices=None, index=None, id=None,
-                 shape_index=None, shape_id=None, feature_index=None, feature_id=None):
-        super().__init__(atom_indices=atom_indices,
-                         feature_index=feature_index, feature_id=feature_id, shape_index=shape_index, shape_id=shape_id,
-                         type_index=index, type_id=id)
-        self.feature_type = "mouth"
-
-    @property
-    def index(self):
-        return self.type_index
-
-    @index.setter
-    def index(self, value):
-        self.type_index = value
-
-    @property
-    def id(self):
-        return self.type_id
-
-    @id.setter
-    def id(self, value):
-        self.type_id = value
+    def __init__(self, feature_id, atom_indices=None, surfaces=None,
+                atom_labels=None, atom_labels_format='atom_id/group_id/chain_id'):
+        super().__init__(feature_id, feature_type='mouth', atom_indices=atom_indices,
+                        surfaces=surfaces, atom_labels=atom_labels, atom_labels_format=atom_labels_format)

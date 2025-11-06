@@ -7,15 +7,6 @@ from typing import Any
 from .base_types import BaseFeature, Feature0D, Feature1D, Feature2D, ShapeType
 
 
-def _shape(feat: BaseFeature) -> str:
-    return str(getattr(feat, 'shape_type', ''))
-
-
-def _dim(feat: BaseFeature) -> int:
-    try:
-        return int(getattr(feat, 'dimensionality', -1))
-    except Exception:
-        return -1
 
 
 def _applies(child: BaseFeature, parent: BaseFeature) -> bool:
