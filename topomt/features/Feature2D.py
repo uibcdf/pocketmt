@@ -2,13 +2,13 @@ from .BaseFeature import BaseFeature
 
 class Feature2D(BaseFeature):
 
-    def __init__(self, feature_id, feature_type='feature_2d', atom_indices=None, boundaries=None, points=None,
+    def __init__(self, feature_id, feature_type='feature_2d', atom_indices=None,
                  atom_labels=None, atom_labels_format='atom_id/group_id/chain_id'):
         super().__init__(feature_id, feature_type=feature_type, atom_indices=atom_indices,
                          atom_labels=atom_labels, atom_labels_format=atom_labels_format)
 
-        self.boundaries = []  # List of boundary objects
-        self.points = []      # List of points
+        self.boundaries = set()
+        self.points = set()
 
         self.solvent_accessible_area = None
         self.solvent_accessible_volume = None
@@ -17,53 +17,24 @@ class Feature2D(BaseFeature):
         self.length = None
         self.corner_points_count = None
 
-        if boundaries is not None:
-            for boundary in boundaries:
-                self.add_boundary(boundary)
+    def add_connected_boundary(self, feature_or_id: 'BaseFeature | str'):
 
-        if points is not None:
-            for point in points:
-                self.add_point(point)
+        if self._topograpy is None:
+            raise ValueError('Topography is not set for this feature. Cannot add connected boundary.')
 
-    def add_boundary(self, boundary):
+        self._topograpy.connect_features(feature_or_id, self.feature_id)
 
-        from .Feature1D import Feature1D
+    def add_connected_point(self, feature_or_id: 'BaseFeature | str'):
 
-        if not isinstance(boundary, Feature1D):
-            raise TypeError(f"Boundary {boundary} is not a 1 dimensional feature.")
+        if self._topograpy is None:
+            raise ValueError('Topography is not set for this feature. Cannot add connected boundary.')
 
-        if self._topography is not None:
-            self._topography.connect_features(boundary, self)
-        else:
-            already_exists = False
-            for existing_boundary in self.boundaries:
-                if existing_boundary.feature_id == boundary.feature_id:
-                    already_exists = True
-                    warn_msg = f"Boundary with feature_id '{boundary.feature_id}' already exists. Skipping addition."
-                    print(warn_msg)
-                    exit
-            if not already_exists:
-                self.boundaries.append(boundary)
-                boundary.add_surface(self)
+        self._topograpy.connect_features(feature_or_id, self.feature_id)
 
-    def add_point(self, point):
+    def _add_boundary_id(self, boundary_id: str):
 
-        from .Feature0D import Feature1D
+        self.boundaries.add(boundary_id)
 
-        if not isinstance(boundary, Feature0D):
-            raise TypeError(f"Point {point} is not a 0 dimensional feature.")
+    def _add_point_id(self, point_id: str):
 
-        if self._topography is not None:
-            self._topography.connect_features(point, self)
-        else:
-            already_exists = False
-            for existing_point in self.points:
-                if existing_point.feature_id == point.feature_id:
-                    already_exists = True
-                    warn_msg = f"Point with feature_id '{point.feature_id}' already exists. Skipping addition."
-                    print(warn_msg)
-                    exit
-            if not already_exists:
-                self.points.append(boundary)
-                point.add_surface(self)
-
+        self.points.add(point_id)

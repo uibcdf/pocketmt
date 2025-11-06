@@ -1,9 +1,6 @@
 from __future__ import annotations
 from ..features.BaseFeature import BaseFeature, FeatureID, FeatureIndex, FeatureType, ShapeType, Dim
-
-from .type_collections import TypeCollection
 from collections.abc import Mapping, Iterator
-from .validators import validate_parent_child_compat, validate_special_rules
 from typing import Any
 import molsysmt as msm
 
@@ -103,7 +100,7 @@ class Topography(Mapping[str, BaseFeature]):
     # public: add_feature
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-    def add_feature(self, feature: BaseFeature) -> FeatureIndex:
+    def add_feature(self, feature: BaseFeature) -> None:
         """
         Add a feature to the topography.
         - automatically updates dimensional, shape, and type registries
@@ -119,11 +116,11 @@ class Topography(Mapping[str, BaseFeature]):
         feature._topography = self
 
         # derived index by dimension
-        self._by_dim.setdefault(feature.dimensionality, set()).append(feature.feature_id)
+        self._by_dim.setdefault(feature.dimensionality, set()).add(feature.feature_id)
         # derived index by shape
-        self._by_shape.setdefault(feature.shape_type, set()).append(feature.feature_id)
+        self._by_shape.setdefault(feature.shape_type, set()).add(feature.feature_id)
         # derived index by type
-        self._by_type.setdefault(feature.feature_type, set()).append(feature.feature_id)
+        self._by_type.setdefault(feature.feature_type, set()).add(feature.feature_id)
 
         # init empty relations
         self._children_of.setdefault(feature.feature_id, set())
@@ -131,168 +128,115 @@ class Topography(Mapping[str, BaseFeature]):
 
 
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # public: linking
+    # public: connect_features
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-    def connect_features(self, child: FeatureID | BaseFeature, parent: FeatureID | BaseFeature) -> None:
+    def connect_features(self, child_feature_or_id: FeatureID | BaseFeature, parent_feature_or_id: FeatureID | BaseFeature) -> None:
         """
         """
 
-        if isinstance(child, str):
-            child = self._features[child]
-        if isinstance(parent, str):
-            parent = self._features[parent]
+        child_id= None
+        parent_id= None
+
+        if isinstance(child_feature_or_id, BaseFeature):
+            if child.feature_id not in self._features:
+                self.add_feature(child)
+            child_id = child_feature_or_id.feature_id
+        elif isinstance(child_feature_or_id, str):
+            child_id = child_feature_or_id
+            if child_id not in self._features:
+                raise ValueError(f"Child feature with id '{child_id}' is not in the topography.")
+
+        if isinstance(parent_feature_or_id, BaseFeature):
+            if parent.feature_id not in self._features:
+                self.add_feature(parent)
+            parent_id = parent_feature_or_id.feature_id
+        elif isinstance(parent_feature_or_id, str):
+            parent_id = parent_feature_or_id
+            if parent_id not in self._features:
+                raise ValueError(f"Parent feature with id '{parent_id}' is not in the topography.")
+
+        child = self._features[child_id]
+        parent = self._features[parent_id]
 
         # external validators
         validate_parent_child_compat(child, parent)
-        current_parents_ids = [
-            self._by_index[p_idx].feature_id
-            for p_idx in self._parents_of.get(child_idx, [])
-        ]
-        validate_special_rules(child, parent, current_parents_ids)
 
         # register relations
-        self._children_of[parent_idx].append(child_idx)
-        self._parents_of[child_idx].append(parent_idx)
+        self._children_of[parent.feature_id].add(child_id)
+        self._parents_of[child.feature_id].add(parent_id)
 
-        # sync parent lists if present
-        if getattr(parent, "dimensionality", None) == 2:
-            # child is 1D → boundary_ids
-            if getattr(child, "dimensionality", None) == 1:
-                current = getattr(parent, "boundary_ids", None)
-                if current is None:
-                    parent.boundary_ids = []
-                if child.feature_id not in parent.boundary_ids:
-                    parent.boundary_ids.append(child.feature_id)
-            # child is 0D → point_ids
-            if getattr(child, "dimensionality", None) == 0:
-                current = getattr(parent, "point_ids", None)
-                if current is None:
-                    parent.point_ids = []
-                if child.feature_id not in parent.point_ids:
-                    parent.point_ids.append(child.feature_id)
-
-        # write parent_id on child if present
-        if hasattr(child, "parent_id"):
-            setattr(child, "parent_id", parent.feature_id)
+        # sync connections in feature objects
+        if parent.dimensionality == 2:
+            child._add_surface(parent_id)
+            if child.dimensionality == 0:
+                parent._add_point(child_id)
+            elif child.dimensionality == 1:
+                parent._add_boundary(child_id)
+        else:
+            raise ValueError('Parent feature must be 2D (Feature2D)')
 
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     # public: lookups
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-    def get_by_id(self, feature_id: FeatureID) -> BaseFeature:
-        """Return the feature object given its public id."""
-        idx = self._ensure_index_from_id(feature_id)
-        return self._by_index[idx]
+    def get_feature_by_id(self, feature_id: FeatureID) -> BaseFeature:
+        return self._features[feature_id]
 
-    @property
-    def features(self) -> tuple[BaseFeature, ...]:
-        """All 2D features."""
-        return tuple(self._by_index[idx] for idx in self._by_dim.get(2, []))
+    def get_features_by_type(self, feature_type: FeatureType) -> set[BaseFeature]:
+        return set(self._features[aux_id] for aux_id in self._by_type[feature_type])
 
-    @property
-    def concavities(self) -> tuple[BaseFeature, ...]:
-        return tuple(self._by_index[idx] for idx in self._by_shape.get("concavity", []))
+    def get_features_by_dimensionality(self, dimensionality: int) -> set[BaseFeature]:
+        return set(self._features[aux_id] for aux_id in self._by_dimensionality[feature_type])
 
-    @property
-    def convexities(self) -> tuple[BaseFeature, ...]:
-        return tuple(self._by_index[idx] for idx in self._by_shape.get("convexity", []))
+    def get_features_id_by_type(self, feature_type: FeatureType) -> set[FeatureId]:
+        return self._by_type[feature_type]
 
-    @property
-    def mixed(self) -> tuple[BaseFeature, ...]:
-        return tuple(self._by_index[idx] for idx in self._by_shape.get("mixed", []))
+    def get_features_id_by_dimensionality(self, dimensionality: int) -> set[FeatureId]:
+        return self._by_dimensionality[dimensionality]
 
-    @property
-    def interfaces(self) -> tuple[BaseFeature, ...]:
-        return self.mixed
-
-    @property
-    def boundaries(self) -> tuple[BaseFeature, ...]:
-        return tuple(self._by_index[idx] for idx in self._by_shape.get("boundary", []))
-
-    @property
-    def points(self) -> tuple[BaseFeature, ...]:
-        return tuple(self._by_index[idx] for idx in self._by_shape.get("point", []))
-
-    def of_type(self, feature_type: FeatureType) -> tuple[BaseFeature, ...]:
-        return tuple(self._by_index[idx] for idx in self._by_type.get(feature_type, []))
-
-    def of_dim(self, dim: int) -> tuple[BaseFeature, ...]:
-        return tuple(self._by_index[idx] for idx in self._by_dim.get(dim, []))
-
-    def of_shape(self, shape: ShapeType) -> tuple[BaseFeature, ...]:
-        return tuple(self._by_index[idx] for idx in self._by_shape.get(shape, []))
-
-    def children_of(self, feature_id: FeatureID) -> tuple[BaseFeature, ...]:
-        idx = self._ensure_index_from_id(feature_id)
-        return tuple(self._by_index[ch_idx] for ch_idx in self._children_of.get(idx, []))
+    def children_of(self, feature_id: FeatureID) -> set[BaseFeature]:
+        return self._children_of[feature_id]
 
     def parents_of(self, feature_id: FeatureID) -> tuple[BaseFeature, ...]:
-        idx = self._ensure_index_from_id(feature_id)
-        return tuple(self._by_index[p_idx] for p_idx in self._parents_of.get(idx, []))
-
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # sugar collections
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        return self._parents_of[feature_id]
 
     @property
-    def pockets(self) -> TypeCollection:
-        return TypeCollection(self, "pocket")
+    def concavities(self) -> set[FeatureID]:
+        return self._by_shape["concavity"]
 
     @property
-    def voids(self) -> TypeCollection:
-        return TypeCollection(self, "void")
+    def convexities(self) -> set[FeatureID]:
+        return self._by_shape["convexity"]
 
     @property
-    def mouths(self) -> TypeCollection:
-        return TypeCollection(self, "mouth")
+    def mixed(self) -> set[FeatureID]:
+        return self._by_shape["convexity"]
 
     @property
-    def baserims(self) -> TypeCollection:
-        return TypeCollection(self, "base_rim")
-
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # family views (needs collections_views)
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-    def _family_types(self, shape: ShapeType) -> list[str]:
-        declared = self._catalog.get(shape, [])
-        discovered: set[str] = set()
-        for idx in self._by_shape.get(shape, []):
-            feat = self._by_index[idx]
-            discovered.add(feat.feature_type)
-        ordered = list(declared)
-        for ft in sorted(discovered):
-            if ft not in ordered:
-                ordered.append(ft)
-        return ordered
+    def boundaries(self) -> set[FeatureID]:
+        return self._by_shape["boundary"]
 
     @property
-    def concavity_types(self):
-        from .collections_views import ConcavityCollection
-        return ConcavityCollection(self, self._family_types("concavity"))
-
-    @property
-    def convexity_types(self):
-        from .collections_views import ConvexityCollection
-        return ConvexityCollection(self, self._family_types("convexity"))
-
-    @property
-    def interface_types(self):
-        from .collections_views import InterfaceCollection
-        return InterfaceCollection(self, self._family_types("mixed"))
-
+    def points(self) -> set[FeatureID]:
+        return self._by_shape["point"]
 
 def _validate_child_parent_compat(child: BaseFeature, parent: BaseFeature) -> Bool:
-    output = False
+
     if child.dimensionality == 0 and parent.dimensionality == 2:
-        output = True
+        pass
     elif child.dimensionality == 1 and parent.dimensionality == 2:
-        output = True
+        pass
     elif parent.dimensionality == 2:
         raise ValueError('Parent must be 2D (Feature2D)')
     if child.dimensionality not in (0, 1):
         raise ValueError('Child must be 0D or 1D')
     else:
         raise ValueError(f"{getattr(child, 'feature_type', '?')} does not apply to {getattr(parent, 'shape_type', '?')}")
+
+    if child.feature_type == 'mouth' and parent.shape_type != 'concavity':
+        raise ValueError('Mouth must attach to a concavity feature')
+
+    if child.feature_type == 'base_rim' and parent.shape_type != 'convexity':
+        raise ValueError('BaseRim must attach to a convexity')
 
