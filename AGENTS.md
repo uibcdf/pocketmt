@@ -160,6 +160,19 @@ consistency.
 - When a string already uses double quotes inside, you can define it with single quotes outside.
 - When embedding JSON or other data formats that require double quotes by specification, preserve their native quoting style.
 
+### 4.11  Type hints and annotations
+
+- All source code targets **Python ≥3.10**.
+- Do **not** use `from __future__ import annotations`.  
+  Modern Python already supports deferred evaluation of annotations (PEP 649).
+- Do **not** wrap types in quotes (e.g., use `str`, not `'str'`), except for
+  forward references to classes defined later in the file or imported under
+  `if TYPE_CHECKING:`.
+- Prefer explicit type annotations in all public functions and methods.
+- Use concrete types (`Path`, `str`, `list[Feature]`, etc.) instead of overly
+  generic ones unless generic typing is required.
+- Avoid `TypeAlias` and `Protocol` unless strictly necessary for structural typing.
+
 ---
 
 ## 5. Testing Guidelines

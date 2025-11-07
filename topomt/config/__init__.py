@@ -33,3 +33,4 @@ def set_default_standard_units(standards=['nm', 'ps', 'K', 'mole', 'amu', 'e',
 #view_from_htmlfiles=('SPHINXWORKING' in environ)
 #del(environ)
 
+from .defaults import atom_label_format

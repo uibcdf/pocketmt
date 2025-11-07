@@ -2,19 +2,21 @@ from .BaseFeature import BaseFeature
 
 class Feature1D(BaseFeature):
 
-    def __init__(self, feature_id, feature_type='feature1D', atom_indices=None,
-                 atom_labels=None, atom_labels_format='atom_id/group_id/chain_id'):
-        super().__init__(feature_id, feature_type=feature_type, atom_indices=atom_indices,
+    def __init__(self, feature_id=None, feature_type='feature1D', atom_indices=None,
+                 atom_labels=None, atom_labels_format=None, **kwargs):
+        super().__init__(feature_id=feature_id, feature_type=feature_type, atom_indices=atom_indices,
                          atom_labels=atom_labels, atom_labels_format=atom_labels_format)
 
         self.surfaces = set()
 
         self.solvent_accessible_area = None
-        self.solvent_accessible_volume = None
+        self.solvent_accessible_length = None
         self.molecular_surface_area = None
-        self.molecular_surface_volume = None
-        self.length = None
-        self.corner_points_count = None
+        self.molecular_surface_length = None
+        self.n_triangles = None
+
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     def add_connected_surface(self, feature_or_id: 'BaseFeature | str'):
 

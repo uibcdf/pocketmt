@@ -1,4 +1,5 @@
 from __future__ import annotations
+from topomt.config import atom_label_format as default_atom_label_format
 
 FeatureID = str
 FeatureIndex = int
@@ -9,14 +10,24 @@ Dim = Literal[0, 1, 2, None]
 
 class BaseFeature():
 
-    def __init__(self, feature_id, feature_type=None, atom_indices=None, atom_labels=None,
-                 labels_format="atom_id/group_id/chain_id"):
+    def __init__(self, feature_id=None, feature_type=None, atom_indices=None, atom_labels=None,
+                 atom_label_format=None, feature_label=None, source=None, source_id=None):
+        """
+            atom_label_format : str, optional
+            Format string for atom labels, e.g. `"{atom_name}-{atom_id}"`.
+        """
+
+        if atom_label_format is None:
+            atom_label_format = default_atom_label_format
 
         self.feature_id = feature_id
         self.feature_type = feature_type
+        self.feature_label = feature_label
+        self.source = source
+        self.source_id = source_id
         self.atom_indices = atom_indices
         self.atom_labels = atom_labels
-        self._labels_format = labels_format
+        self.atom_label_format = atom_label_format
         self.shape_type = None
         self.dimensionality = None
         self._topography = None
@@ -24,6 +35,10 @@ class BaseFeature():
         if self.feature_type is not None:
             self._set_shape_type()
             self._set_dimensionality()
+
+        if source is None:
+            self.source = "TopoMT"
+            self.source_id = self.feature_id
 
     def __repr__(self):
         return f"<Feature feature_id={self.feature_id} feature_type={self.feature_type} shape_type={self.shape_type}>"
@@ -76,4 +91,15 @@ class BaseFeature():
 
         from .catalog import shape_type_by_feature_type
         self.shape_type = shape_type_by_feature_type[self.feature_type]
+
+#                atom_index = topography.molecular_system.topology.get_atom_indices(atom_id=atom_id, atom_name=atom_name,
+#
+#
+#                if len(atom_index) == 0:
+#                    raise ValueError(f"Atom with id {atom_id}, name {atom_name}, group {group_name}, chain {chain_id} not found.")
+#                elif len(atom_index) > 1:
+#                    raise ValueError(f"Multiple atoms found for id {atom_id}, name {atom_name}, group {group_name}, chain {chain_id}.")
+#                else:
+#                    atom_index = atom_index[0]
+
 

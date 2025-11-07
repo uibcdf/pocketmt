@@ -2,9 +2,9 @@ from .BaseFeature import BaseFeature
 
 class Feature2D(BaseFeature):
 
-    def __init__(self, feature_id, feature_type='feature_2d', atom_indices=None,
-                 atom_labels=None, atom_labels_format='atom_id/group_id/chain_id'):
-        super().__init__(feature_id, feature_type=feature_type, atom_indices=atom_indices,
+    def __init__(self, feature_id=None, feature_type='feature_2d', atom_indices=None,
+                 atom_labels=None, atom_labels_format=None, **kwargs):
+        super().__init__(feature_id=feature_id, feature_type=feature_type, atom_indices=atom_indices,
                          atom_labels=atom_labels, atom_labels_format=atom_labels_format)
 
         self.boundaries = set()
@@ -16,6 +16,10 @@ class Feature2D(BaseFeature):
         self.molecular_surface_volume = None
         self.length = None
         self.corner_points_count = None
+
+        if kwargs:
+            for key, value in kwargs.items():
+                setattr(self, key, value)
 
     def add_connected_boundary(self, feature_or_id: 'BaseFeature | str'):
 
