@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ..features.BaseFeature import BaseFeature, FeatureID, FeatureIndex, FeatureType, ShapeType, Dim
+from ..features.BaseFeature import BaseFeature, FeatureID, FeatureIndex, FeatureType, ShapeType, Dimensionality
 from collections.abc import Mapping, Iterator
 from typing import Any
 import molsysmt as msm
@@ -40,6 +40,10 @@ class Topography(Mapping[str, BaseFeature]):
         # molecular system references
         self._molecular_system: Any | None = None
         self._molsys: Any | None = None
+
+        if molecular_system is not None:
+            self.molecular_system = molecular_system
+            self.molsys = msm.convert(molecular_system, to_form='molsysmt.MolSys')
 
     # -----------------
     # Mapping interface
@@ -118,7 +122,7 @@ class Topography(Mapping[str, BaseFeature]):
         feature._topography = self
 
         # derived index by dimension
-        self._by_dim.setdefault(feature.dimensionality, set()).add(feature_id)
+        self._by_dimensionality.setdefault(feature.dimensionality, set()).add(feature_id)
         # derived index by shape
         self._by_shape.setdefault(feature.shape_type, set()).add(feature_id)
         # derived index by type
@@ -171,7 +175,7 @@ class Topography(Mapping[str, BaseFeature]):
         new_feature = feature_class(feature_id=feature_id, atom_indices=atom_indices, atom_labels=atom_labels,
                                     atom_label_format=atom_label_format, **kwargs)
 
-        self.add_feature(feature)
+        self.add_feature(new_feature)
 
         if new_feature_id:
             return feature_id
@@ -232,19 +236,34 @@ class Topography(Mapping[str, BaseFeature]):
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
     def get_feature_by_id(self, feature_id: FeatureID) -> BaseFeature:
-        return self._features[feature_id]
+        if feature_id not in self._features:
+            raise ValueError(f"Feature with id '{feature_id}' is not in the topography.")
+        else:
+            return self._features[feature_id]
 
     def get_features_by_type(self, feature_type: FeatureType) -> set[BaseFeature]:
-        return set(self._features[aux_id] for aux_id in self._by_type[feature_type])
+        if feature_type not in self._by_type:
+            return set()
+        else:
+            return set(self._features[aux_id] for aux_id in self._by_type[feature_type])
 
-    def get_features_by_dimensionality(self, dimensionality: int) -> set[BaseFeature]:
-        return set(self._features[aux_id] for aux_id in self._by_dimensionality[feature_type])
+    def get_features_by_dimensionality(self, dimensionality: Dimensionality) -> set[BaseFeature]:
+        if dimensionality not in self._by_dimensionality:
+            return set()
+        else:
+            return set(self._features[aux_id] for aux_id in self._by_dimensionality[dimensionality])
 
-    def get_features_id_by_type(self, feature_type: FeatureType) -> set[FeatureId]:
-        return self._by_type[feature_type]
+    def get_feature_ids_by_type(self, feature_type: FeatureType) -> set[FeatureId]:
+        if feature_type not in self._by_type:
+            return set()
+        else:
+            return self._by_type[feature_type]
 
-    def get_features_id_by_dimensionality(self, dimensionality: int) -> set[FeatureId]:
-        return self._by_dimensionality[dimensionality]
+    def get_feature_ids_by_dimensionality(self, dimensionality: Dimensionality) -> set[FeatureId]:
+        if dimensionality not in self._by_dimensionality:
+            return set()
+        else:
+            return self._by_dimensionality[dimensionality]
 
     def children_of(self, feature_id: FeatureID) -> set[BaseFeature]:
         return self._children_of[feature_id]
@@ -279,7 +298,7 @@ class Topography(Mapping[str, BaseFeature]):
     def _make_next_feature_id(self, feature_type: FeatureType) -> FeatureID:
         """
         Generate the next default feature id for a given feature type.
-        E.g., for feature_type 'pocket', returns 'POC-0', 'Pocket002', etc.
+        E.g., for feature_type 'pocket', returns 'POC-1', 'VOI-20', etc.
         """
 
         n_features_of_type = len(self._by_type.get(feature_type, []))

@@ -1,11 +1,12 @@
 from __future__ import annotations
 from topomt.config import atom_label_format as default_atom_label_format
+from typing import Any, Literal
 
 FeatureID = str
 FeatureIndex = int
 FeatureType = str
 ShapeType = Literal["concavity", "convexity", "mixed", "boundary", "point"]
-Dim = Literal[0, 1, 2, None]
+Dimensionality = Literal[0, 1, 2, None]
 
 
 class BaseFeature():

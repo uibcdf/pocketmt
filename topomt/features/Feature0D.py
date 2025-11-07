@@ -3,9 +3,9 @@ from .BaseFeature import BaseFeature
 class Feature0D(BaseFeature):
 
     def __init__(self, feature_id=None, feature_type='feature_0d', atom_indices=None,
-                 atom_labels=None, atom_labels_format=None):
+                 atom_labels=None, atom_label_format=None):
         super().__init__(feature_id=feature_id, feature_type=feature_type, atom_indices=atom_indices,
-                        atom_labels=atom_labels, atom_labels_format=atom_labels_format)
+                        atom_labels=atom_labels, atom_label_format=atom_label_format)
 
         self.surfaces = set()
 

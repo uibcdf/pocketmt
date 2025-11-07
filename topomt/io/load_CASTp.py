@@ -5,6 +5,7 @@ from topomt._private.path import ensure_path_exists_and_is_file, ensure_path_exi
 
 from pathlib import Path
 from os import PathLike
+from typing import Any
 
 _atom_label_format="{atom_id}-{atom_name}/{group_name}/{chain_id}"
 

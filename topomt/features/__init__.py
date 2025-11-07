@@ -19,3 +19,15 @@ _FEATURE_TYPE_REGISTRY = {
     'channel': Channel,
     'branched_channel': BranchedChannel,
 }
+
+_FEATURE_TYPE_ALIASES = {
+    'BaseFeature': 'base_feature',
+    'Feature0D': 'feature_0d',
+    'Feature1D': 'feature_1d',
+    'Feature2D': 'feature_2d',
+    'Pocket': 'pocket',
+    'Void': 'void',
+    'Mouth': 'mouth',
+    'Channel': 'channel',
+    'BranchedChannel': 'branched_channel',
+}

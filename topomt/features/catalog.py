@@ -12,15 +12,15 @@ shape_type_by_feature_type = {
 }
 for shape_type, feature_types in feature_types_by_shape_type.items():
     for feature_type in feature_types:
-        shape_type_by_feature_type[feature_type] = shape_typha
+        shape_type_by_feature_type[feature_type] = shape_type
 
 dimensionality_by_feature_type = {
 }
 for shape_type, feature_types in feature_types_by_shape_type.items():
     for feature_type in feature_types:
         if shape_type in ["point"]:
-            dimensionality_by_feature_type[feature_type] = "0d"
+            dimensionality_by_feature_type[feature_type] = 0
         elif shape_type in ["boundary"]:
-            dimensionality_by_feature_type[feature_type] = "1d"
+            dimensionality_by_feature_type[feature_type] = 1
         elif shape_type in ["concavity", "convexity", "mixed"]:
-            dimensionality_by_feature_type[feature_type] = "2d"
+            dimensionality_by_feature_type[feature_type] = 2

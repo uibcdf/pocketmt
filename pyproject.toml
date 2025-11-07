@@ -61,10 +61,10 @@ where = ["."]
 
 # Ref https://setuptools.pypa.io/en/latest/userguide/datafiles.html#package-data
 [tool.setuptools.package-data]
-opocket = [
+topomt = [
     "py.typed"
 ]
-#"opocket.data" = ["**"]
+"topomt.data" = ["**"]
 
 [tool.versioningit]
 default-version = "1+unknown"
