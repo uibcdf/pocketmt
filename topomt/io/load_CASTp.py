@@ -80,7 +80,7 @@ def _parse_mouth_file(file_path: PathLike[str]):
             chain_id = fields[4]
             mouth_id = int(fields[11])
             mouth_marker = fields[12]
-            if poc_marker != 'M4P':
+            if mouth_marker != 'M4P':
                 raise ValueError(f"Unexpected marker '{mouth_marker}' in .mouth file '{file_path}'.")
 
             mouth_id_to_atom_labels.setdefault(mouth_id, set()).add(
@@ -128,7 +128,7 @@ def _parse_poc_info_file(file_path: PathLike[str]) -> dict[str, dict[str, Any]]:
     return poc_id_to_poc_data
 
 
-def _parse_mouth_info(file_path: PathLike) -> dict[int, dict[str, Any]]:
+def _parse_mouth_info_file(file_path: PathLike) -> dict[int, dict[str, Any]]:
     mouth_id_to_mouth_data: dict[int, dict[str, Any]] = {}
     with file_path.open("r", encoding="utf-8") as handle:
         header_skipped = False
@@ -220,12 +220,12 @@ def load_CASTp(poc_file=None, pocInfo_file=None, mouth_file=None, mouthInfo_file
     for mouth_id, atom_labels in mouth_id_to_atom_labels.items():
         source_id = 'Mouth ' + str(mouth_id)
         args_dict = {}
-        if mouth_id in mouth_id_to_poc_data:
+        if mouth_id in mouth_id_to_mouth_data:
             args_dict['solvent_accessible_area'] = mouth_id_to_mouth_data[mouth_id]['solvent_accessible_area']
-            args_dict['molecular_surface_area'] = mouth_id_to_poc_data[mouth_id]['molecular_surface_area']
-            args_dict['solvent_accessible_length'] = mouth_id_to_poc_data[mouth_id]['solvent_accessible_length']
-            args_dict['molecular_surface_length'] = mouth_id_to_poc_data[mouth_id]['molecular_surface_length']
-            args_dict['n_triangles'] = mouth_id_to_poc_data[mouth_id]['n_triangles']
+            args_dict['molecular_surface_area'] = mouth_id_to_mouth_data[mouth_id]['molecular_surface_area']
+            args_dict['solvent_accessible_length'] = mouth_id_to_mouth_data[mouth_id]['solvent_accessible_length']
+            args_dict['molecular_surface_length'] = mouth_id_to_mouth_data[mouth_id]['molecular_surface_length']
+            args_dict['n_triangles'] = mouth_id_to_mouth_data[mouth_id]['n_triangles']
         feature_id = topography.add_new_feature(feature_type='mouth', atom_labels=atom_labels,
                                                 atom_label_format=_atom_label_format, source='CASTp',
                                                 source_id=source_id, **args_dict)

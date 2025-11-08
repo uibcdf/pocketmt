@@ -4,10 +4,10 @@ import copy
 class Void(Feature2D):
 
     def __init__(self, feature_id=None, atom_indices=None, boundaries=None, points=None,
-                 atom_labels=None, atom_label_format=None, topography=None):
+                 atom_labels=None, atom_label_format=None, source=None, source_id=None, topography=None):
         super().__init__(feature_id=None, feature_type='void', atom_indices=atom_indices,
                         boundaries=boundaries, points=points, atom_labels=atom_labels,
-                        atom_label_format=atom_label_format, topography=topography)
+                        atom_label_format=atom_label_format, source=None, source_id=None, topography=topography)
 
     def copy(self, deep: bool = True) -> 'Void':
         """Return a copy of the Topography object.

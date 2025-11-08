@@ -4,9 +4,10 @@ import copy
 class Feature2D(BaseFeature):
 
     def __init__(self, feature_id=None, feature_type='feature_2d', atom_indices=None,
-                 atom_labels=None, atom_label_format=None, topography=None, **kwargs):
+                 atom_labels=None, atom_label_format=None, topography=None, source=None, source_id=None, **kwargs):
         super().__init__(feature_id=feature_id, feature_type=feature_type, atom_indices=atom_indices,
-                         atom_labels=atom_labels, atom_label_format=atom_label_format, topography=topography)
+                         atom_labels=atom_labels, atom_label_format=atom_label_format, source=None, source_id=None,
+                         topography=topography)
 
         self.boundaries = set()
         self.points = set()

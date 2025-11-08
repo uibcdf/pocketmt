@@ -3,9 +3,14 @@ import copy
 
 class Pocket(Feature2D):
 
-    def __init__(self, feature_id=None, atom_indices=None, atom_labels=None, atom_label_format=None, topography=None):
+    def __init__(self, feature_id=None, atom_indices=None, atom_labels=None, atom_label_format=None, source=None,
+                 source_id=None, topography=None, **kwargs):
         super().__init__(feature_id=feature_id, feature_type='pocket', atom_indices=atom_indices,
-                        atom_labels=atom_labels, atom_label_format=atom_label_format, topography=topography)
+                         atom_labels=atom_labels, atom_label_format=atom_label_format, source=None, source_id=None,
+                         topography=topography)
+
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     def copy(self, deep: bool = True) -> 'Pocket':
         """Return a copy of the Topography object.

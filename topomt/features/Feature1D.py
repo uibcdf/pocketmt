@@ -4,9 +4,10 @@ import copy
 class Feature1D(BaseFeature):
 
     def __init__(self, feature_id=None, feature_type='feature1D', atom_indices=None,
-                 atom_labels=None, atom_label_format=None, topograpy=None, **kwargs):
+                 atom_labels=None, atom_label_format=None, source=None, source_id=None, topography=None, **kwargs):
         super().__init__(feature_id=feature_id, feature_type=feature_type, atom_indices=atom_indices,
-                         atom_labels=atom_labels, atom_label_format=atom_label_format, topograpy=topograpy)
+                         atom_labels=atom_labels, atom_label_format=atom_label_format, source=None, source_id=None,
+                         topography=topography)
 
         self.surfaces = set()
 
