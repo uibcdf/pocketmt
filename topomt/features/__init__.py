@@ -8,6 +8,9 @@ from .Channel import Channel
 from .BranchedChannel import BranchedChannel
 from .Mouth import Mouth
 
+from ._feature_constants import _FEATURE_PREFIXES, _FEATURE_TYPE_ALIASES, _FEATURE_TYPE_TO_CLASS_NAME, \
+        _FEATURE_TYPES_BY_SHAPE_TYPE, _SHAPE_TYPE_BY_FEATURE_TYPE, _DIMENSIONALITY_BY_FEATURE_TYPE
+
 _FEATURE_TYPE_REGISTRY = {
     'base_feature': BaseFeature,
     'feature_0d': Feature0D,
@@ -20,14 +23,3 @@ _FEATURE_TYPE_REGISTRY = {
     'branched_channel': BranchedChannel,
 }
 
-_FEATURE_TYPE_ALIASES = {
-    'BaseFeature': 'base_feature',
-    'Feature0D': 'feature_0d',
-    'Feature1D': 'feature_1d',
-    'Feature2D': 'feature_2d',
-    'Pocket': 'pocket',
-    'Void': 'void',
-    'Mouth': 'mouth',
-    'Channel': 'channel',
-    'BranchedChannel': 'branched_channel',
-}

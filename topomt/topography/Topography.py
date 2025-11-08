@@ -3,8 +3,8 @@ from ..features.BaseFeature import BaseFeature, FeatureID, FeatureIndex, Feature
 from collections.abc import Mapping, Iterator
 from typing import Any
 import molsysmt as msm
-from topomt.features.feature_id import make_feature_id as _make_feature_id
-from topomt.features import _FEATURE_TYPE_REGISTRY
+from topomt.features import _FEATURE_TYPE_REGISTRY, _FEATURE_PREFIXES
+import copy
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Main class
@@ -49,6 +49,9 @@ class Topography(Mapping[str, BaseFeature]):
     # Mapping interface
     # -----------------
 
+    def __repr__(self) -> str:
+        return f"<TopoMT Topography with {len(self)} features>"
+
     def __getitem__(self, feature_id: FeatureId) -> BaseFeature:
         """Allow: topo["Pock001"] → feature with feature_id == "Pock001"."""
         return self._features[feature_id]
@@ -59,6 +62,41 @@ class Topography(Mapping[str, BaseFeature]):
 
     def __len__(self) -> int:
         return len(self._features)
+
+    def copy(self, deep: bool = True) -> Topography:
+        """Return a copy of the Topography object.
+
+        Parameters
+        ----------
+        deep : bool, optional
+            If True (default), perform a deep copy of all internal
+            data structures. If False, only a shallow copy is made.
+        """
+        return copy.deepcopy(self) if deep else copy.copy(self)
+
+    def __copy__(self):
+        new_topo = Topography(molecular_system=self._molsys)
+        new_topo._molecular_system = self._molecular_system
+        for feature_id, feature in self._features.items():
+            new_feature = feature.copy(deep=False)
+            new_feature._topography = new_topo
+            new_topo.add_feature(new_feature)
+        for parent_id, chidren_id in self._children_of.items():
+            for child_id in chidren_id:
+                new_topo.connect_features(child_id, parent_id)
+        return new_topo
+
+    def __deepcopy__(self, memo):
+        new_topo = Topography(molecular_system=copy.deepcopy(self._molsys, memo))
+        new_topo._molecular_system = copy.deepcopy(self._molecular_system, memo)
+        for feature_id, feature in self._features.items():
+            new_feature = feature.copy(deep=True)
+            new_feature._topography = new_topo
+            new_topo.add_feature(new_feature)
+        for parent_id, chidren_id in self._children_of.items():
+            for child_id in chidren_id:
+                new_topo.connect_features(child_id, parent_id)
+        return new_topo
 
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     # internal helpers
@@ -119,7 +157,11 @@ class Topography(Mapping[str, BaseFeature]):
         self._features[feature_id] = feature
 
         # ensure features share the topography references
-        feature._topography = self
+        if feature._topography is not None:
+            if id(feature._topography) != id(self):
+                raise ValueError("Feature is already assigned to a different Topography.")
+        else:
+            feature._topography = self
 
         # derived index by dimension
         self._by_dimensionality.setdefault(feature.dimensionality, set()).add(feature_id)
@@ -301,8 +343,9 @@ class Topography(Mapping[str, BaseFeature]):
         E.g., for feature_type 'pocket', returns 'POC-1', 'VOI-20', etc.
         """
 
-        n_features_of_type = len(self._by_type.get(feature_type, []))
-        return _make_feature_id(feature_type, n_features_of_type+1)
+        index = len(self._by_type.get(feature_type, []))+1
+        prefix = _FEATURE_PREFIXES.get(feature_type, feature_type[:3].upper())
+        return f'{prefix}-{index}'
 
 
 def _validate_child_parent_compat(child: BaseFeature, parent: BaseFeature) -> Bool:

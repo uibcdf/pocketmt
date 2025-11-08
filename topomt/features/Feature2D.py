@@ -1,11 +1,12 @@
 from .BaseFeature import BaseFeature
+import copy
 
 class Feature2D(BaseFeature):
 
     def __init__(self, feature_id=None, feature_type='feature_2d', atom_indices=None,
-                 atom_labels=None, atom_label_format=None, **kwargs):
+                 atom_labels=None, atom_label_format=None, topography=None, **kwargs):
         super().__init__(feature_id=feature_id, feature_type=feature_type, atom_indices=atom_indices,
-                         atom_labels=atom_labels, atom_label_format=atom_label_format)
+                         atom_labels=atom_labels, atom_label_format=atom_label_format, topography=topography)
 
         self.boundaries = set()
         self.points = set()
@@ -20,6 +21,43 @@ class Feature2D(BaseFeature):
         if kwargs:
             for key, value in kwargs.items():
                 setattr(self, key, value)
+
+    def copy(self, deep: bool = True) -> 'Feature2D':
+        """Return a copy of the Topography object.
+
+        Parameters
+        ----------
+        deep : bool, optional
+            If True (default), perform a deep copy of all internal
+            data structures. If False, only a shallow copy is made.
+        """
+        return copy.deepcopy(self) if deep else copy.copy(self)
+
+    def __copy__(self):
+
+        new_feature = super().__copy__()
+        new_feature.boundaries = copy.copy(self.boundaries)
+        new_feature.points = copy.copy(self.points)
+        new_feature.solvent_accessible_area = copy.copy(self.solvent_accessible_area)
+        new_feature.solvent_accessible_volume = copy.copy(self.solvent_accessible_volume)
+        new_feature.molecular_surface_area = copy.copy(self.molecular_surface_area)
+        new_feature.molecular_surface_volume = copy.copy(self.molecular_surface_volume)
+        new_feature.length = copy.copy(self.length)
+        new_feature.corner_points_count = copy.copy(self.corner_points_count)
+        return new_feature
+
+    def __deepcopy__(self, memo):
+
+        new_feature = super().__deepcopy__(memo)
+        new_feature.boundaries = copy.deepcopy(self.boundaries, memo)
+        new_feature.points = copy.deepcopy(self.points, memo)
+        new_feature.solvent_accessible_area = copy.deepcopy(self.solvent_accessible_area, memo)
+        new_feature.solvent_accessible_volume = copy.deepcopy(self.solvent_accessible_volume, memo)
+        new_feature.molecular_surface_area = copy.deepcopy(self.molecular_surface_area, memo)
+        new_feature.molecular_surface_volume = copy.deepcopy(self.molecular_surface_volume, memo)
+        new_feature.length = copy.deepcopy(self.length, memo)
+        new_feature.corner_points_count = copy.deepcopy(self.corner_points_count, memo)
+        return new_feature
 
     def add_connected_boundary(self, feature_or_id: 'BaseFeature | str'):
 

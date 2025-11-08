@@ -1,8 +1,29 @@
 from .Feature2D import Feature2D
+import copy
 
 class Pocket(Feature2D):
 
-    def __init__(self, feature_id, atom_indices=None, atom_labels=None, atom_label_format=None):
-        super().__init__(feature_id, feature_type='pocket', atom_indices=atom_indices,
-                        atom_labels=atom_labels, atom_label_format=atom_label_format)
+    def __init__(self, feature_id=None, atom_indices=None, atom_labels=None, atom_label_format=None, topography=None):
+        super().__init__(feature_id=feature_id, feature_type='pocket', atom_indices=atom_indices,
+                        atom_labels=atom_labels, atom_label_format=atom_label_format, topography=topography)
 
+    def copy(self, deep: bool = True) -> 'Pocket':
+        """Return a copy of the Topography object.
+
+        Parameters
+        ----------
+        deep : bool, optional
+            If True (default), perform a deep copy of all internal
+            data structures. If False, only a shallow copy is made.
+        """
+        return copy.deepcopy(self) if deep else copy.copy(self)
+
+    def __copy__(self):
+
+        new_feature = super().__copy__()
+        return new_feature
+
+    def __deepcopy__(self, memo):
+
+        new_feature = super().__deepcopy__(memo)
+        return new_feature
