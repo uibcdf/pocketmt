@@ -45,6 +45,10 @@ class Topography(Mapping[str, BaseFeature]):
             self.molecular_system = molecular_system
             self.molsys = msm.convert(molecular_system, to_form='molsysmt.MolSys')
 
+        if features is not None:
+            for feature in features:
+                self.add_feature(feature)
+
     # -----------------
     # Mapping interface
     # -----------------
@@ -173,6 +177,11 @@ class Topography(Mapping[str, BaseFeature]):
         # init empty relations
         self._children_of.setdefault(feature_id, set())
         self._parents_of.setdefault(feature_id, set())
+
+        # ensure atom_indices are set if atom_labels and molecular_system are provided
+        if self._molsys is not None:
+            if (feature.atom_labels is not None) and (feature.atom_indices is None):
+                feature.atom_indices = feature._get_atom_indices_from_atom_labels()
 
         if new_feature_id:
             return feature_id

@@ -1,5 +1,6 @@
 from __future__ import annotations
 from topomt.config import atom_label_format as default_atom_label_format
+from topomt._private.atom_label import parse_list_of_atom_labels
 from typing import Any, Literal
 from ._feature_constants import _FEATURE_TYPE_TO_CLASS_NAME, _DIMENSIONALITY_BY_FEATURE_TYPE, \
         _SHAPE_TYPE_BY_FEATURE_TYPE
@@ -47,6 +48,9 @@ class BaseFeature():
         if source is None:
             self.source = "TopoMT"
             self.source_id = self.feature_id
+
+        if (self.atom_indices is None) and (self.atom_labels is not None) and (self._topography is not None):
+            self.atom_indices = self._get_atom_indices_from_atom_labels()
 
     def __repr__(self):
         class_name = _FEATURE_TYPE_TO_CLASS_NAME.get(self.feature_type)
@@ -148,14 +152,17 @@ class BaseFeature():
 
         self.shape_type = _SHAPE_TYPE_BY_FEATURE_TYPE[self.feature_type]
 
-#                atom_index = topography.molecular_system.topology.get_atom_indices(atom_id=atom_id, atom_name=atom_name,
-#
-#
-#                if len(atom_index) == 0:
-#                    raise ValueError(f"Atom with id {atom_id}, name {atom_name}, group {group_name}, chain {chain_id} not found.")
-#                elif len(atom_index) > 1:
-#                    raise ValueError(f"Multiple atoms found for id {atom_id}, name {atom_name}, group {group_name}, chain {chain_id}.")
-#                else:
-#                    atom_index = atom_index[0]
+    def _get_atom_indices_from_atom_labels(self):
 
+        if self._topography is None:
+            raise ValueError("Topography is not set for this feature.")
+
+        dict_of_lists = parse_list_of_atom_labels(self.atom_labels, self.atom_label_format, output_type='dict of lists')
+        if 'atom_id' in dict_of_lists:
+            dict_of_lists['atom_id'] = [int(x) for x in dict_of_lists['atom_id']]
+        if 'group_id' in dict_of_lists:
+            dict_of_lists['group_id'] = [int(x) for x in dict_of_lists['group_id']]
+        atom_indices = self._topography.molsys.topology.get_atom_indices(**dict_of_lists)
+
+        return atom_indices
 

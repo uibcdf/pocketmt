@@ -163,31 +163,46 @@ def test_pocket_with_atom_indices_7(topography_empty_1tcd):
     assert id(topography['P1']) == id(pocket)
     assert len(topography) == 1
 
+# 8. add existing Pocket with no feature_id and topography to topography
+def test_pocket_with_atom_indices_8(topography_empty_1tcd):
+
+    topography = topography_empty_1tcd
+    feature_id = topography._make_next_feature_id('pocket')
+    pocket = tmt.features.Pocket(feature_id=None, atom_indices=[1,2,3], topography=topography)
+    topography.add_feature(pocket)
+
+    assert id(pocket._topography) == id(topography)
+    assert id(topography[feature_id]) == id(pocket)
+    assert len(topography) == 1
 
 
-# def test_add_new_pocket_1(topography_empty_1tcd):
-# 
-#     topography = topography_empty_1tcd
-#     feature_id = topography.add_new_feature(feature_type='pocket', atom_indices=[1,2,3])
-#     new_feature = topography[feature_id]
-# 
-#     assert new_feature.boundaries == set()
-#     assert new_feature.points == set()
-#     assert new_feature.solvent_accessible_area == None
-#     assert new_feature.solvent_accessible_volume == None
-#     assert new_feature.molecular_surface_area == None
-#     assert new_feature.molecular_surface_volume == None
-#     assert new_feature.length == None
-#     assert new_feature.corner_points_count == None
-#     assert new_feature.feature_id == feature_id
-#     assert new_feature.feature_type == 'pocket'
-#     assert new_feature.feature_label == None
-#     assert new_feature.source == 'TopoMT'
-#     assert new_feature.source_id == feature_id
-#     assert new_feature.atom_indices == [1,2,3]
-#     assert new_feature.atom_labels == None
-#     assert new_feature.atom_label_format == tmt.config.defaults.atom_label_format
-#     assert new_feature.shape_type == 'concavity'
-#     assert new_feature.dimensionality == 2
-#     assert id(new_feature._topography) == id(topography)
+# 9. add new Pocket with feature_id and no topography to topography
+def test_pocket_with_atom_indices_9(topography_empty_1tcd):
+
+    topography = topography_empty_1tcd
+    topography.add_new_feature(feature_type='pocket', atom_indices=[1,2,3], feature_id='P1')
+
+    assert isinstance(topography['P1'], tmt.features.Pocket)
+    assert len(topography) == 1
+    assert id(topography['P1']._topography) == id(topography)
+
+# 10. add new Pocket with no feature_id and no topography to topography
+def test_pocket_with_atom_indices_10(topography_empty_1tcd):
+
+    topography = topography_empty_1tcd
+    feature_id = topography._make_next_feature_id('pocket')
+    topography.add_new_feature(feature_type='pocket', atom_indices=[1,2,3])
+
+    assert isinstance(topography[feature_id], tmt.features.Pocket)
+    assert len(topography) == 1
+    assert id(topography[feature_id]._topography) == id(topography)
+
+# 11. add new Pocket with feature_id and topography to topography
+# This test makes no sense because the Pocket is created inside the topography
+# The method add_new_feature has no topography input argument
+
+# 12. add new Pocket with no feature_id and topography to topography
+# This test makes no sense because the Pocket is created inside the topography
+# The method add_new_feature has no topography input argument
+
 
