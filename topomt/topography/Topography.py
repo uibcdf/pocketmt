@@ -151,7 +151,7 @@ class Topography(Mapping[str, BaseFeature]):
         else:
             feature_id = feature.feature_id
             if feature_id in self._features:
-                raise ValueError(f"Feature with id '{feature_id}' is already in the topography.")
+                Warning(f"Feature with id '{feature_id}' is already in the topography. Skipping addition.")
 
         # store
         self._features[feature_id] = feature

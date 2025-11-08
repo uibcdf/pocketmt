@@ -96,6 +96,7 @@ def test_pocket_with_atom_indices_3(topography_empty_1tcd):
     assert pocket.dimensionality == 2
     assert id(pocket._topography) == id(topography)
     assert id(topography['P1']) == id(pocket)
+    assert len(topography) == 1
 
 # 4. instant Pocket with no feature_id and topography
 def test_pocket_with_atom_indices_4(topography_empty_1tcd):
@@ -124,6 +125,7 @@ def test_pocket_with_atom_indices_4(topography_empty_1tcd):
     assert pocket.dimensionality == 2
     assert id(pocket._topography) == id(topography)
     assert id(topography[feature_id]) == id(pocket)
+    assert len(topography) == 1
 
 
 # 5. add existing Pocket with feature_id and no topography to topography
@@ -131,11 +133,36 @@ def test_pocket_with_atom_indices_5(topography_empty_1tcd):
 
     topography = topography_empty_1tcd
     pocket = tmt.features.Pocket(feature_id='P1', atom_indices=[1,2,3], topography=None)
-    print(topography.features)
     topography.add_feature(pocket)
 
     assert id(pocket._topography) == id(topography)
     assert id(topography['P1']) == id(pocket)
+    assert len(topography) == 1
+
+
+# 6. add existing Pocket with no feature_id and no topography to topography
+def test_pocket_with_atom_indices_6(topography_empty_1tcd):
+
+    topography = topography_empty_1tcd
+    feature_id = topography._make_next_feature_id('pocket')
+    pocket = tmt.features.Pocket(feature_id=None, atom_indices=[1,2,3], topography=None)
+    topography.add_feature(pocket)
+
+    assert id(pocket._topography) == id(topography)
+    assert id(topography[feature_id]) == id(pocket)
+    assert len(topography) == 1
+
+# 7. add existing Pocket with feature_id and topography to topography
+def test_pocket_with_atom_indices_7(topography_empty_1tcd):
+
+    topography = topography_empty_1tcd
+    pocket = tmt.features.Pocket(feature_id='P1', atom_indices=[1,2,3], topography=topography)
+    topography.add_feature(pocket)
+
+    assert id(pocket._topography) == id(topography)
+    assert id(topography['P1']) == id(pocket)
+    assert len(topography) == 1
+
 
 
 # def test_add_new_pocket_1(topography_empty_1tcd):
