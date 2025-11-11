@@ -130,12 +130,6 @@ class BaseFeature():
             return None
         return self._topography.molecular_system
 
-    @property
-    def molsys(self) -> Any | None:
-        if self._topography is None:
-            return None
-        return self._topography.molsys
-
     def _set_dimensionality(self):
 
         if self.feature_type is None:
@@ -162,7 +156,7 @@ class BaseFeature():
             dict_of_lists['atom_id'] = [int(x) for x in dict_of_lists['atom_id']]
         if 'group_id' in dict_of_lists:
             dict_of_lists['group_id'] = [int(x) for x in dict_of_lists['group_id']]
-        atom_indices = self._topography.molsys.topology.get_atom_indices(**dict_of_lists)
+        atom_indices = self._topography._molsys.topology.get_atom_indices(**dict_of_lists)
 
         return atom_indices
 

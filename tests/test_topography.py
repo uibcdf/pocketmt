@@ -14,16 +14,16 @@ def test_empty_Topography():
     assert len(topography) == 0
     assert topography.features == {}
     assert topography.molecular_system is None
-    assert topography.molsys is None
-    assert topography.get_features_by_type('pocket')==set()
-    assert topography.get_features_by_dimensionality(2)==set()
-    assert topography.get_feature_ids_by_type('pocket')==set()
-    assert topography.get_feature_ids_by_dimensionality(2)==set()
-    assert topography.concavities==set()
-    assert topography.convexities==set()
-    assert topography.mixed==set()
-    assert topography.boundaries==set()
-    assert topography.points==set()
+    assert topography._molsys is None
+    assert topography.get_features(by='type', value='pocket')==set()
+    assert topography.get_features(by='type', value='pocket', as_feature_ids=True)==set()
+    assert topography.get_features(by='dimensionality', value=2)==set()
+    assert topography.get_features(by='dimensionality', value=2, as_feature_ids=True)==set()
+    assert topography.get_features(by='shape', value='concavity')==set()
+    assert topography.get_features(by='shape', value='convexity')==set()
+    assert topography.get_features(by='shape', value='mixed')==set()
+    assert topography.get_features(by='shape', value='boundary')==set()
+    assert topography.get_features(by='shape', value='point')==set()
     assert topography._make_next_feature_id('pocket')=='POC-1'
 
 
@@ -35,16 +35,16 @@ def test_empty_Topography_with_molecular_system(topography_empty_1tcd):
     assert len(topography) == 0
     assert topography.features == {}
     assert topography.molecular_system == tmt.demo['TcTIM']['1tcd.pdb']
-    assert type(topography.molsys) == MolSys
-    assert topography.get_features_by_type('pocket')==set()
-    assert topography.get_features_by_dimensionality(2)==set()
-    assert topography.get_feature_ids_by_type('pocket')==set()
-    assert topography.get_feature_ids_by_dimensionality(2)==set()
-    assert topography.concavities==set()
-    assert topography.convexities==set()
-    assert topography.mixed==set()
-    assert topography.boundaries==set()
-    assert topography.points==set()
+    assert type(topography._molsys) == MolSys
+    assert topography.get_features(by='type', value='pocket')==set()
+    assert topography.get_features(by='type', value='pocket', as_feature_ids=True)==set()
+    assert topography.get_features(by='dimensionality', value=2)==set()
+    assert topography.get_features(by='dimensionality', value=2, as_feature_ids=True)==set()
+    assert topography.get_features(by='shape', value='concavity')==set()
+    assert topography.get_features(by='shape', value='convexity')==set()
+    assert topography.get_features(by='shape', value='mixed')==set()
+    assert topography.get_features(by='shape', value='boundary')==set()
+    assert topography.get_features(by='shape', value='point')==set()
     assert topography._make_next_feature_id('pocket')=='POC-1'
 
 def test_Topography_new_pocket(topography_empty_1tcd):
@@ -62,21 +62,21 @@ def test_Topography_new_pocket(topography_empty_1tcd):
     assert isinstance(list(topography.features.values())[0], Pocket)
     assert isinstance(topography['POC-1'], Pocket)
     assert topography.molecular_system == tmt.demo['TcTIM']['1tcd.pdb']
-    assert type(topography.molsys) == MolSys
-    assert topography.get_features_by_type('pocket')==set([new_feature])
-    assert topography.get_features_by_type('void')==set()
-    assert topography.get_features_by_dimensionality(0)==set()
-    assert topography.get_features_by_dimensionality(1)==set()
-    assert topography.get_features_by_dimensionality(2)==set([new_feature])
-    assert topography.get_feature_ids_by_type('pocket')==set(['POC-1'])
-    assert topography.get_feature_ids_by_dimensionality(0)==set()
-    assert topography.get_feature_ids_by_dimensionality(1)==set()
-    assert topography.get_feature_ids_by_dimensionality(2)==set(['POC-1'])
-    assert topography.concavities==set(['POC-1'])
-    assert topography.convexities==set()
-    assert topography.mixed==set()
-    assert topography.boundaries==set()
-    assert topography.points==set()
+    assert type(topography._molsys) == MolSys
+    assert topography.get_features(by='type', value='pocket')==set([new_feature])
+    assert topography.get_features(by='type', value='pocket', as_feature_ids=True)==set(['POC-1'])
+    assert topography.get_features(by='dimensionality', value=2)==set([new_feature])
+    assert topography.get_features(by='dimensionality', value=2, as_feature_ids=True)==set(['POC-1'])
+    assert topography.get_features(by='shape', value='concavity')==set([new_feature])
+    assert topography.get_features(by='shape', value='concavity', as_feature_ids=True)==set(['POC-1'])
+    assert topography.get_features(by='shape', value='convexity')==set()
+    assert topography.get_features(by='shape', value='convexity', as_feature_ids=True)==set()
+    assert topography.get_features(by='shape', value='mixed')==set()
+    assert topography.get_features(by='shape', value='mixed', as_feature_ids=True)==set()
+    assert topography.get_features(by='shape', value='boundary')==set()
+    assert topography.get_features(by='shape', value='boundary', as_feature_ids=True)==set()
+    assert topography.get_features(by='shape', value='point')==set()
+    assert topography.get_features(by='shape', value='point', as_feature_ids=True)==set()
     assert topography._make_next_feature_id('pocket')=='POC-2'
     assert topography._make_next_feature_id('void')=='VOI-1'
 

@@ -1,4 +1,5 @@
 from topomt import pyunitwizard as puw
+from topomt._private.digestion import digest
 import numpy as np
 from scipy.spatial import Voronoi
 from scipy.spatial.distance import euclidean
@@ -26,17 +27,16 @@ class AlphaSpheres():
 
     """
 
-    def __init__(self, points=None):
+    @digest()
+    def __init__(self, points=None, radii=None, method='voronoi', skip_digestion=False):
+
+        # method can be 'voronoi' or 'weighted_voronoi' in future implementations
 
         """Creating a new instance of AlphaSpheres
 
-        With an array of three dimensional positions (`points`) the resultant set of alpha-spheres is returned
-        as a class AlphaSpheres.
 
         Parameters
         ----------
-        points: ndarray (shape=[n_points,3], dtype=float)
-            Array with the three dimensional coordinates of the input points.
 
         Examples
         --------
@@ -58,39 +58,18 @@ class AlphaSpheres():
 
         if points is not None:
 
-            # Checking if the argument points fulfills requirements
-
-            if puw.is_quantity(points):
-                if puw.check(coordinates, dimensionality={'[L]':1}):
-
-                    points_values, points_unit = puw.get_value_and_unit(points)
-
-                else:
-                    raise ValueError("The argument points needs to be a numpy array with shape (n_points, 3) and length units")
-            else:
-                if isinstance(points, (list, tuple)):
-                    points = np.array(points)
-                elif isinstance(points, np.ndarray):
-                    pass
-                else:
-                    raise ValueError("The argument points needs to be a numpy array with shape (n_points, 3)")
-
-            if (len(points.shape)!=2) and (points.shape[1]!=3):
-                raise ValueError("The argument points needs to be a numpy array with shape (n_points, 3)")
-
-            # Saving attributes points and n_points
-
             self.points = points
             self.n_points = points.shape[0]
 
             # Voronoi class to build the alpha-spheres
 
-            voronoi = Voronoi(self.points)
+            points_value, length_unit = puw.get_value_and_unit(points)
+            voronoi = Voronoi(points_value)
 
             # The alpha-spheres centers are the voronoi vertices
 
-            self.centers = voronoi.vertices
-            self.n_alpha_spheres = self.centers.shape[0]
+            self.centers = puw.quantity(voronoi.vertices, length_unit)
+            self.n_alpha_spheres = voronoi.vertices.shape[0]
 
             # Let's compute the 4 atoms' sets in contact with each alpha-sphere
 
@@ -115,11 +94,11 @@ class AlphaSpheres():
             self.radii = []
 
             for ii in range(self.n_alpha_spheres):
-                radius = euclidean(self.centers[ii], self.points[self.points_of_alpha_sphere[ii][0]])
+                radius = euclidean(voronoi.vertices[ii], points_value[self.points_of_alpha_sphere[ii][0]])
                 self.radii.append(radius)
 
             self.points_of_alpha_sphere = np.array(self.points_of_alpha_sphere)
-            self.radii = np.array(self.radii)
+            self.radii = puw.quantity(np.array(self.radii), length_unit)
 
     def remove_alpha_spheres(self, indices):
 

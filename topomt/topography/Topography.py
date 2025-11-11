@@ -18,32 +18,36 @@ class Topography(Mapping[str, BaseFeature]):
     Internal storage and relations use *feature_index* for efficiency.
     """
 
-    def __init__(self, molecular_system: Any | None = None, features: list[BaseFeature] | None = None) -> None:
+    def __init__(self, molecular_system: Any | None = None, selection: Any = 'all', structure_indices: int = 0,
+                 features: list[BaseFeature] | None = None) -> None:
         # main store: id → feature
         self._features: dict[FeatureID, BaseFeature] = {}
 
         # derived indexes
-        self._by_dimensionality: dict[int, set[FeatureId]] = {0: set(), 1: set(), 2: set()}
-        self._by_shape: dict[ShapeType, set[FeatureId]] = {
+        self._by_dimensionality: dict[int, set[FeatureID]] = {0: set(), 1: set(), 2: set()}
+        self._by_shape: dict[ShapeType, set[FeatureID]] = {
             "concavity": set(),
             "convexity": set(),
             "mixed": set(),
             "boundary": set(),
             "point": set(),
         }
-        self._by_type: dict[FeatureType, set[FeatureId]] = {}
+        self._by_type: dict[FeatureType, set[FeatureID]] = {}
 
         # parent/child relations (by id)
-        self._children_of: dict[FeatureId, set[FeatureId]] = {}
-        self._parents_of: dict[FeatureId, set[FeatureId]] = {}
+        self._children_of: dict[FeatureID, set[FeatureID]] = {}
+        self._parents_of: dict[FeatureID, set[FeatureID]] = {}
 
         # molecular system references
         self._molecular_system: Any | None = None
         self._molsys: Any | None = None
+        self.selection = selection
+        self.structure_indices = structure_indices
 
         if molecular_system is not None:
-            self.molecular_system = molecular_system
-            self.molsys = msm.convert(molecular_system, to_form='molsysmt.MolSys')
+            self._molecular_system = molecular_system
+            self._molsys = msm.convert(molecular_system, selection=selection, structure_indices=structure_indices,
+                                       to_form='molsysmt.MolSys')
 
         if features is not None:
             for feature in features:
@@ -54,15 +58,15 @@ class Topography(Mapping[str, BaseFeature]):
     # -----------------
 
     def __repr__(self) -> str:
-        return f"<TopoMT Topography with {len(self)} features>"
+        parts = ", ".join(f"{ftype}={len(ids)}" for ftype, ids in self._by_type.items())
+        return f"<TopoMT Topography total={len(self)} {parts}>"
 
-    def __getitem__(self, feature_id: FeatureId) -> BaseFeature:
+    def __getitem__(self, feature_id: FeatureID) -> BaseFeature:
         """Allow: topo["Pock001"] → feature with feature_id == "Pock001"."""
         return self._features[feature_id]
 
-    def __iter__(self) -> Iterator[int]:
-        """Iterate over features in insertion order."""
-        return iter(self._features.values())
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._features)
 
     def __len__(self) -> int:
         return len(self._features)
@@ -119,23 +123,9 @@ class Topography(Mapping[str, BaseFeature]):
         if value is None:
             self._molecular_system = None
             self._molsys = None
-            return
-
-        self._molecular_system = value
-
-    @property
-    def molsys(self) -> Any | None:
-        return self._molsys
-
-    @molsys.setter
-    def molsys(self, value: Any | None) -> None:
-        if value is None:
-            self._molsys = None
         else:
-            if msm.form.molsysmt_MolSys.is_form(value):
-                self._molsys = value
-            else:
-                raise ValueError("Assigned value is not a molsysmt.MolSys object")
+            self._molecular_system = value
+            self._molsys = msm.convert(value, to_form='molsysmt.MolSys')
 
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     # public: add_feature and add_new_feature
@@ -245,8 +235,8 @@ class Topography(Mapping[str, BaseFeature]):
         parent_id= None
 
         if isinstance(child_feature_or_id, BaseFeature):
-            if child.feature_id not in self._features:
-                self.add_feature(child)
+            if child_feature_or_id.feature_id not in self._features:
+                self.add_feature(child_feature_or_id)
             child_id = child_feature_or_id.feature_id
         elif isinstance(child_feature_or_id, str):
             child_id = child_feature_or_id
@@ -254,8 +244,8 @@ class Topography(Mapping[str, BaseFeature]):
                 raise ValueError(f"Child feature with id '{child_id}' is not in the topography.")
 
         if isinstance(parent_feature_or_id, BaseFeature):
-            if parent.feature_id not in self._features:
-                self.add_feature(parent)
+            if parent_feature_or_id.feature_id not in self._features:
+                self.add_feature(parent_feature_or_id)
             parent_id = parent_feature_or_id.feature_id
         elif isinstance(parent_feature_or_id, str):
             parent_id = parent_feature_or_id
@@ -266,7 +256,7 @@ class Topography(Mapping[str, BaseFeature]):
         parent = self._features[parent_id]
 
         # external validators
-        validate_parent_child_compat(child, parent)
+        _validate_parent_child_compat(child, parent)
 
         # register relations
         self._children_of[parent.feature_id].add(child_id)
@@ -286,61 +276,118 @@ class Topography(Mapping[str, BaseFeature]):
     # public: lookups
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+    def get_features(
+        self,
+        *,
+        by: str | None = None,
+        value: str | int | list | tuple | set | None = None,
+        grouped_by: str | None = None,
+        as_feature_ids: bool = False,
+    ):
+        """Devuelve features filtradas y opcionalmente agrupadas.
+
+        Parameters
+        ----------
+        by : {"id", "type", "shape", "dimensionality", None}
+            Criterio de filtrado. Si es None, se consideran todas.
+        value : any
+            Valor del criterio. Para "id" puede ser str o iterable de str.
+        grouped_by : {"type", "shape", "dimensionality", None}
+            Si se indica, la salida es un dict agrupado por ese criterio.
+        as_feature_ids : bool
+            Si True, se devuelven ids; si False, objetos.
+        """
+        # 1) obtener el conjunto inicial de ids
+        if by is None:
+            feature_ids = set(self._features.keys())
+
+        elif by == "type":
+            feature_ids = set(self._by_type.get(value, ()))
+
+        elif by == "shape":
+            feature_ids = set(self._by_shape.get(value, ()))
+
+        elif by == "dimensionality":
+            feature_ids = set(self._by_dimensionality.get(value, ()))
+
+        elif by == "id":
+            # value puede ser un id o un iterable de ids
+            feature_ids = set()
+            if isinstance(value, str):
+                if value in self._features:
+                    feature_ids.add(value)
+            elif isinstance(value, (list, tuple, set)):
+                for fid in value:
+                    if fid in self._features:
+                        feature_ids.add(fid)
+            else:
+                # nada válido
+                feature_ids = set()
+        else:
+            raise ValueError(f"Unknown 'by' criterion: {by!r}")
+
+        # 2) si no hay agrupamiento, devolvemos lista plana
+        if grouped_by is None:
+            if as_feature_ids:
+                return feature_ids
+            else:
+                return set([self._features[fid] for fid in feature_ids])
+
+        # 3) salida agrupada
+        out: dict[str | int, list] = {}
+        for fid in feature_ids:
+            feat = self._features[fid]
+            if grouped_by == "type":
+                key = feat.feature_type
+            elif grouped_by == "shape":
+                key = feat.shape_type
+            elif grouped_by == "dimensionality":
+                key = feat.dimensionality
+            else:
+                raise ValueError(f"Unknown 'grouped_by' criterion: {grouped_by!r}")
+
+            out.setdefault(key, set())
+            out[key].add(fid if as_feature_ids else feat)
+
+        return out
+
     def get_feature_by_id(self, feature_id: FeatureID) -> BaseFeature:
         if feature_id not in self._features:
             raise ValueError(f"Feature with id '{feature_id}' is not in the topography.")
         else:
             return self._features[feature_id]
 
-    def get_features_by_type(self, feature_type: FeatureType) -> set[BaseFeature]:
-        if feature_type not in self._by_type:
-            return set()
+    def children_of(self, feature_id: FeatureID, as_feature_ids=False) -> set[BaseFeature] | set[FeatureID]:
+        if as_feature_ids:
+            return self._children_of[feature_id]
         else:
-            return set(self._features[aux_id] for aux_id in self._by_type[feature_type])
+            return set([self._features[fid] for fid in self._children_of[feature_id]])
 
-    def get_features_by_dimensionality(self, dimensionality: Dimensionality) -> set[BaseFeature]:
-        if dimensionality not in self._by_dimensionality:
-            return set()
+    def parents_of(self, feature_id: FeatureID, as_feature_ids=False) -> set[BaseFeature] | set[FeatureID]:
+        if as_feature_ids:
+            return self._parents_of[feature_id]
         else:
-            return set(self._features[aux_id] for aux_id in self._by_dimensionality[dimensionality])
+            return set([self._features[fid] for fid in self._parents_of[feature_id]])
 
-    def get_feature_ids_by_type(self, feature_type: FeatureType) -> set[FeatureId]:
-        if feature_type not in self._by_type:
-            return set()
-        else:
-            return self._by_type[feature_type]
+    def info(self) -> dict[str, dict[str, int]]:
+        return {
+            "by_type": {ftype: len(ids) for ftype, ids in self._by_type.items()},
+            "by_shape": {shape: len(ids) for shape, ids in self._by_shape.items()},
+            "by_dimensionality": {dim: len(ids) for dim, ids in self._by_dimensionality.items()},
+            "total": len(self._features),
+        }
 
-    def get_feature_ids_by_dimensionality(self, dimensionality: Dimensionality) -> set[FeatureId]:
-        if dimensionality not in self._by_dimensionality:
-            return set()
-        else:
-            return self._by_dimensionality[dimensionality]
 
-    def children_of(self, feature_id: FeatureID) -> set[BaseFeature]:
-        return self._children_of[feature_id]
-
-    def parents_of(self, feature_id: FeatureID) -> tuple[BaseFeature, ...]:
-        return self._parents_of[feature_id]
-
-    @property
-    def concavities(self) -> set[FeatureID]:
-        return self._by_shape["concavity"]
-
-    @property
-    def convexities(self) -> set[FeatureID]:
-        return self._by_shape["convexity"]
-
-    @property
-    def mixed(self) -> set[FeatureID]:
-        return self._by_shape["convexity"]
-
-    @property
-    def boundaries(self) -> set[FeatureID]:
-        return self._by_shape["boundary"]
-
-    @property
-    def points(self) -> set[FeatureID]:
-        return self._by_shape["point"]
+    def to_records(self) -> list[dict[str, object]]:
+        records = []
+        for fid, feat in self._features.items():
+            records.append({
+                "id": fid,
+                "type": feat.feature_type,
+                "shape": feat.shape_type,
+                "dim": feat.dimensionality,
+            })
+        return records
 
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     # auxiliary functions
@@ -357,7 +404,7 @@ class Topography(Mapping[str, BaseFeature]):
         return f'{prefix}-{index}'
 
 
-def _validate_child_parent_compat(child: BaseFeature, parent: BaseFeature) -> Bool:
+def _validate_child_parent_compat(child: BaseFeature, parent: BaseFeature) -> None:
 
     if child.dimensionality == 0 and parent.dimensionality == 2:
         pass
