@@ -1,10 +1,16 @@
 import molsysmt as msm
-from molsysmt._private.digestion import digest
-from molsysmt._private.variables import is_all
+from topomt import pyunitwizard as puw
+from topomt._private.digestion import digest
+from topomt._private.variables import is_all
+from topomt._private.edges_list import connected_components_union_find
+from scipy.spatial import cKDTree
 
 @digest()
 def fpocket(molecular_system, selection='all', structure_indices=0, min_alpha_sphere_radius='3 angstroms',
-            max_alpha_sphere_radius='6 angstroms', syntax='MolSysMT'):
+            max_alpha_sphere_radius='6 angstroms', max_neighbor_center_distance='1.73 angstroms',
+            max_components_center_distance='4.5 angstroms', pbc=False, syntax='MolSysMT', skip_digestion=False):
+
+    # pbc=True debería asegurar que el sistema es completo, sin moléculas partidas por las fronteras de la caja.
 
     from topomt import Topography
     from topomt.alpha_spheres import AlphaSpheres
@@ -42,6 +48,35 @@ def fpocket(molecular_system, selection='all', structure_indices=0, min_alpha_sp
     alpha_spheres.remove_small_alpha_spheres(min_alpha_sphere_radius)
     alpha_spheres.remove_big_alpha_spheres(max_alpha_sphere_radius)
 
+    neighbors = alpha_spheres.get_neighbors('edge')
+    edges_alpha_spheres = []
 
+    for ii, list_of_neighbors in neighbors.items():
+        for jj in list_of_neighbors:
+            if ii < jj:
+                distance = alpha_spheres.get_centers_distance(ii, jj)
+                if distance <= max_neighbor_center_distance:
+                    edges_alpha_spheres.append([ii,jj])
 
-    return alpha_spheres
+    components = connected_components_union_find(edges_alpha_spheres)
+    components_1_filter = [component for component in components if len(component)>1]
+
+    geometric_centers_components = []
+    for component in components_1_filter:
+            geometric_centers_components.append(alpha_spheres.centers[component].mean(axis=0))
+
+    geometric_centers_components = puw.utils.numpy.vstack(geometric_centers_components)
+    aux_dists, aux_unit = puw.get_value_and_unit(geometric_centers_components)
+    aux_threshold = puw.get_value(max_components_center_distance, to_unit=aux_unit)
+    tree = cKDTree(aux_dists)
+    edges_components = tree.query_pairs(r=aux_threshold)
+    lumped_components = connected_components_union_find(edges_components)
+    components_2_filter = [] 
+    for lumped_component in lumped_components:
+        lumped_component_combined = []
+        for index in lumped_component:
+            lumped_component_combined.extend(components_1_filter[index])
+        components_2_filter.append(lumped_component_combined)
+
+    return components_2_filter
+#    return components_not_single_alpha_sphere

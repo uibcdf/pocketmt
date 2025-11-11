@@ -175,6 +175,81 @@ class AlphaSpheres():
 
         return list(point_indices)
 
+    def get_neighbors(self, criterion: str = "point") -> dict[int, list[int]]:
+        """Return the symmetric dictionary of alpha-sphere neighbors.
+
+        Parameters
+        ----------
+        criterion : {"point", "edge", "face"}
+            - "point": neighbors that share at least 1 point (atom).
+            - "edge": neighbors that share at least 2 points (a edge).
+            - "face": neighbors that share at least 3 points (a face).
+
+        Returns
+        -------
+        neighbors : dict[int, list[int]]
+            Dictionary where each key is the alpha-sphere index and the value is
+            the sorted list of neighbor alpha-sphere indices.
+
+        Notes
+        -----
+        This method assumes ``self.points_of_alpha_sphere`` is an array-like
+        where each element is the iterable of point indices touched by that
+        alpha-sphere.
+        """
+
+        criterion_map = {
+            "point": 1,
+            "edge": 2,
+            "face": 3,
+        }
+        if criterion not in criterion_map:
+            raise ValueError(
+                f"criterion must be one of {tuple(criterion_map)}, got {criterion!r}"
+            )
+        min_shared = criterion_map[criterion]
+
+        n_as = self.n_alpha_spheres
+        # índice inverso punto -> esferas
+        point_to_spheres: dict[int, list[int]] = {}
+
+        for as_idx in range(n_as):
+            pts = self.points_of_alpha_sphere[as_idx]
+            for p in pts:
+                point_to_spheres.setdefault(int(p), []).append(as_idx)
+
+        # diccionario de sets para ir construyendo vecinos simétricos
+        neighbors_sets: dict[int, set[int]] = {i: set() for i in range(n_as)}
+
+        # para cada esfera contamos cuántos puntos comparte con las demás
+        for as_idx in range(n_as):
+            shared_counts: dict[int, int] = {}
+            pts = self.points_of_alpha_sphere[as_idx]
+            for p in pts:
+                for other_idx in point_to_spheres[int(p)]:
+                    if other_idx == as_idx:
+                        continue
+                    shared_counts[other_idx] = shared_counts.get(other_idx, 0) + 1
+
+            # filtramos según el mínimo de puntos compartidos
+            for other_idx, count in shared_counts.items():
+                if count >= min_shared:
+                    neighbors_sets[as_idx].add(other_idx)
+                    neighbors_sets[other_idx].add(as_idx)  # simetría
+
+        # lo devolvemos ya como dict de listas ordenadas
+        neighbors: dict[int, list[int]] = {
+            i: sorted(list(s))
+            for i, s in neighbors_sets.items()
+            if len(s) > 0
+        }
+
+        return neighbors
+
+    def get_centers_distance(self, i: int, j: int):
+        """Return the Euclidean distance (Å) between the centers of two alpha-spheres."""
+        diff = self.centers[i] - self.centers[j]
+        return (diff[0]**2+diff[1]**2+diff[2]**2) ** 0.5
 
     def view(self, view=None, indices='all'):
 
