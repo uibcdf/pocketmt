@@ -1,0 +1,34 @@
+HEADER
+HEADER This is a pdb format file writen by the programm fpocket.                 
+HEADER It represents the atoms contacted by the voronoi vertices of the pocket.  
+HEADER                                                                           
+HEADER Information about the pocket    21:
+HEADER 0  - Pocket Score                      : -0.0336
+HEADER 1  - Drug Score                        : 0.0026
+HEADER 2  - Number of alpha spheres           :    16
+HEADER 3  - Mean alpha-sphere radius          : 4.0922
+HEADER 4  - Mean alpha-sphere Solvent Acc.    : 0.6186
+HEADER 5  - Mean B-factor of pocket residues  : 0.2275
+HEADER 6  - Hydrophobicity Score              : 35.3333
+HEADER 7  - Polarity Score                    :     1
+HEADER 8  - Amino Acid based volume Score     : 4.0000
+HEADER 9  - Pocket volume (Monte Carlo)       : 129.3071
+HEADER 10 - Pocket volume (convex hull)       : 0.3708
+HEADER 11 - Charge Score                      :     0
+HEADER 12 - Local hydrophobic density Score   : 7.0000
+HEADER 13 - Number of apolar alpha sphere     :     8
+HEADER 14 - Proportion of apolar alpha sphere : 0.5000
+ATOM   3735   CG PRO B 241     -12.373  55.955  47.215  0.00  0.00           C 0
+ATOM   3736   CD PRO B 241     -11.358  56.729  47.978  0.00  0.00           C 0
+ATOM   2070   CA LEU B  25      -8.295  50.638  46.950  0.00  0.00           C 0
+ATOM   2074   CG LEU B  25      -6.952  52.796  47.585  0.00  0.00           C 0
+ATOM   2069    N LEU B  25      -8.947  49.596  47.729  0.59  1.09           N 0
+ATOM   2066   CB PRO B  24     -11.271  48.517  49.375  0.00  0.00           C 0
+ATOM   2042    O LEU B  21      -7.741  49.791  51.283  0.59  4.29           O 0
+ATOM   2064    C PRO B  24     -10.004  48.935  47.265  0.00  0.00           C 0
+ATOM   2099  OG1 THR B  28     -11.863  51.485  44.742  0.48  6.43           O 0
+ATOM   2073   CB LEU B  25      -7.216  51.304  47.795  0.00  0.00           C 0
+ATOM   3716    O LEU B 239      -7.243  55.825  50.552  0.45  4.29           O 0
+ATOM   2046  CD2 LEU B  21      -6.542  52.121  52.310  0.00  0.00           C 0
+TER
+END

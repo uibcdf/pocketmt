@@ -1,0 +1,37 @@
+HEADER
+HEADER This is a pdb format file writen by the programm fpocket.                 
+HEADER It represents the atoms contacted by the voronoi vertices of the pocket.  
+HEADER                                                                           
+HEADER Information about the pocket    16:
+HEADER 0  - Pocket Score                      : 0.0413
+HEADER 1  - Drug Score                        : 0.0002
+HEADER 2  - Number of alpha spheres           :    19
+HEADER 3  - Mean alpha-sphere radius          : 3.9170
+HEADER 4  - Mean alpha-sphere Solvent Acc.    : 0.5607
+HEADER 5  - Mean B-factor of pocket residues  : 0.3302
+HEADER 6  - Hydrophobicity Score              : 28.3750
+HEADER 7  - Polarity Score                    :     3
+HEADER 8  - Amino Acid based volume Score     : 3.6250
+HEADER 9  - Pocket volume (Monte Carlo)       : 189.7200
+HEADER 10 - Pocket volume (convex hull)       : 4.9982
+HEADER 11 - Charge Score                      :     2
+HEADER 12 - Local hydrophobic density Score   : 1.0000
+HEADER 13 - Number of apolar alpha sphere     :     2
+HEADER 14 - Proportion of apolar alpha sphere : 0.1053
+ATOM   1159   OG SER A 156       5.894  48.049  82.132  0.24  6.43           O 0
+ATOM    865    O ALA A 115       6.796  50.301  74.459  0.60  4.29           O 0
+ATOM    891   CB ALA A 119       3.203  50.126  74.504  0.00  0.00           C 0
+ATOM   1140    O LYS A 154       9.174  52.570  79.911  0.43  8.57           O 0
+ATOM   1153  CD2 LEU A 155      10.757  49.074  77.995  0.00  0.00           C 0
+ATOM    863   CA ALA A 115       8.994  51.209  74.798  0.00  0.00           C 0
+ATOM    888   CA ALA A 119       3.267  48.639  74.703  0.00  0.00           C 0
+ATOM   1158   CB SER A 156       6.228  48.988  83.153  0.00  0.00           C 0
+ATOM   1154    N SER A 156       8.418  49.251  82.143  0.67  1.09           N 0
+ATOM   1182   CB ALA A 159       7.723  46.175  79.546  0.00  0.00           C 0
+ATOM   1147   CA LEU A 155      10.143  50.140  80.745  0.00  0.00           C 0
+ATOM    887    N ALA A 119       4.623  48.151  74.492  0.70  1.09           N 0
+ATOM    885   CB CYS A 118       7.254  46.787  75.523  0.00  0.00           C 0
+ATOM   1213  NH2 ARG A 162       4.126  44.331  77.150  0.48  8.75           N 0
+ATOM    883    C CYS A 118       4.946  46.854  74.528  0.00  0.00           C 0
+TER
+END

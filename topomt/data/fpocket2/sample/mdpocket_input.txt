@@ -1,0 +1,4 @@
+sample/snap_1.pdb
+sample/snap_11.pdb
+sample/snap_21.pdb
+sample/snap_31.pdb

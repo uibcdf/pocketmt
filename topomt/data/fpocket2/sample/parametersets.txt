@@ -1,0 +1,13 @@
+parameter sets for mdpocket :
+
+for internal PUTATIVE channels and many small cavitiies (extensive search) :
+mdpocket -L mdpocket_input.txt -m 2.8 -M 5.5 -i 3 -n 2
+
+for internal STERICALLLY possible water holding cavities (extensive search):
+mdpocket -L mdpocket_input.txt -m 3.5 -M 5.5 -i 3 -n 2
+
+for external cavities (sterically water holding) :
+mdpocket -L mdpocket_input.txt -m 3.5 -M 10.0 -i 3 -n 2 
+
+for fpocket like scoring of ligand (small sugar/drug or whatever) protein pockets : 
+mdpocket -L mdpocket -L mdpocket_input.txt -S

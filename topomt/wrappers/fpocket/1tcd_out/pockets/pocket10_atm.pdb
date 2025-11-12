@@ -1,0 +1,42 @@
+HEADER
+HEADER This is a pdb format file writen by the programm fpocket.                 
+HEADER It represents the atoms contacted by the voronoi vertices of the pocket.  
+HEADER                                                                           
+HEADER Information about the pocket    10:
+HEADER 0  - Pocket Score                      : 0.0882
+HEADER 1  - Drug Score                        : 0.0003
+HEADER 2  - Number of alpha spheres           :    24
+HEADER 3  - Mean alpha-sphere radius          : 3.7820
+HEADER 4  - Mean alpha-sphere Solvent Acc.    : 0.5051
+HEADER 5  - Mean B-factor of pocket residues  : 0.3218
+HEADER 6  - Hydrophobicity Score              : -11.4444
+HEADER 7  - Polarity Score                    :     6
+HEADER 8  - Amino Acid based volume Score     : 3.8889
+HEADER 9  - Pocket volume (Monte Carlo)       : 133.1798
+HEADER 10 - Pocket volume (convex hull)       : 2.2191
+HEADER 11 - Charge Score                      :     2
+HEADER 12 - Local hydrophobic density Score   : 0.0000
+HEADER 13 - Number of apolar alpha sphere     :     1
+HEADER 14 - Proportion of apolar alpha sphere : 0.0417
+ATOM   3461    O ALA B 205       9.831  67.041  26.581  0.62  6.43           O 0
+ATOM   1911    O SER B   3       5.973  68.115  24.801  0.29  6.43           O 0
+ATOM   3639  NH2 ARG B 227       5.640  73.009  26.040  0.36  6.56           N 0
+ATOM   1913   OG SER B   3       5.618  70.937  23.732  0.43  3.21           O 0
+ATOM   3355   CD ARG B 192      11.146  72.035  30.445  0.00  0.00           C 0
+ATOM   3459   CA ALA B 205      11.746  68.451  26.228  0.00  0.00           C 0
+ATOM   3456    O ALA B 204      12.241  68.988  28.869  0.80  1.07           O 0
+ATOM   3462   CB ALA B 205      11.852  68.507  24.686  0.00  0.00           C 0
+ATOM   3358  NH1 ARG B 192      10.349  69.383  31.090  0.76  1.09           N 0
+ATOM   1929   CD PRO B   5       6.590  66.804  28.496  0.00  0.00           C 0
+ATOM   1915   CA LYS B   4       4.339  68.176  26.974  0.00  0.00           C 0
+ATOM   3357   CZ ARG B 192       9.766  70.423  31.699  0.00  0.00           C 0
+ATOM   3637   CZ ARG B 227       5.291  73.689  27.140  0.00  0.00           C 0
+ATOM   3638  NH1 ARG B 227       4.369  73.189  27.947  0.81  3.28           N 0
+ATOM   1919   CG LYS B   4       2.979  69.770  28.474  0.00  0.00           C 0
+ATOM   3646  OD1 ASP B 228       8.407  73.787  31.292  0.61  5.36           O 0
+ATOM   3632    O ARG B 227       4.693  72.765  30.937  0.00  0.00           O 0
+ATOM   3356   NE ARG B 192      10.128  71.671  31.413  0.00  0.00           N 0
+ATOM   3663  ND2 ASN B 230       5.492  67.938  31.493  0.81  1.09           N 0
+ATOM   3359  NH2 ARG B 192       8.797  70.220  32.591  0.00  0.00           N 0
+TER
+END

@@ -26,6 +26,7 @@ from .get_pockets import get_pockets, show_pockets
 from . import io
 
 from . import methods
+from . import wrappers
 
 __all__ = ["Topography",]
 

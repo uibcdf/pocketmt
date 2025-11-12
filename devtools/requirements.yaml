@@ -46,6 +46,7 @@ docs:
     - sphinx-tabs
     - sphinxcontrib-plantuml
     - myst-nb
+    - fpocket
 
 development:
   channels:
