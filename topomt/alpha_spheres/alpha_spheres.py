@@ -155,14 +155,14 @@ class AlphaSpheres():
 
         Examples
         --------
-        >>> import openpocket as opoc
+        >>> import topomt as tmt
         >>> points = ([[-1.,  2.,  0.],
         >>>            [ 0.,  2.,  1.],
         >>>            [ 1., -2.,  1.],
         >>>            [ 0.,  1.,  1.],
         >>>            [ 0.,  0.,  0.],
         >>>            [-1., -1.,  0.]])
-        >>> aspheres = opoc.AlphaSpheres(points)
+        >>> aspheres = tmt.AlphaSpheres(points)
         >>> aspheres.get_points_of_alpha_spheres([1,3])
         [0,2,3,4,5]
 
@@ -251,7 +251,8 @@ class AlphaSpheres():
         diff = self.centers[i] - self.centers[j]
         return (diff[0]**2+diff[1]**2+diff[2]**2) ** 0.5
 
-    def view(self, view=None, indices='all'):
+    def show_alpha_spheres(self, view=None, indices='all', show_points=True, sphere_color=[0.8,0.8,0.8],
+                            point_color=[0.8,0.0,0.0], point_radius='0.2 angstrom'):
 
         """3D spatial view of alpha-spheres and points
         An NGLview view is returned with alpha-spheres (gray color) and points (red color).
@@ -268,15 +269,15 @@ class AlphaSpheres():
 
         Examples
         --------
-        >>> import openpocket as opoc
+        >>> import topomt as tmt
         >>> points = ([[-1.,  2.,  0.],
         >>>            [ 0.,  2.,  1.],
         >>>            [ 1., -2.,  1.],
         >>>            [ 0.,  1.,  1.],
         >>>            [ 0.,  0.,  0.],
         >>>            [-1., -1.,  0.]])
-        >>> aspheres = opoc.alpha_spheres.AlphaSpheresSet(points)
-        >>> view = aspheres.view([1,3])
+        >>> aspheres = tmt.alpha_spheres.AlphaSpheres(points)
+        >>> view = aspheres.show_alpha_spheres([1,3])
         >>> view
         """
 
@@ -294,14 +295,16 @@ class AlphaSpheres():
         else:
             point_indices=self.get_points_of_alpha_spheres(indices)
 
-        for index in point_indices:
-            atom_coordinates = self.points[index,:]
-            view.shape.add_sphere(list(atom_coordinates), [0.8,0.0,0.0], 0.2)
+        if show_points:
+            for index in point_indices:
+                atom_coordinates_value = puw.get_value(self.points[index,:])
+                point_radius_value = puw.get_value(point_radius)
+                view.shape.add_sphere(list(atom_coordinates_value), point_color, point_radius_value)
 
         for index in indices:
-            sphere_coordinates = self.centers[index,:]
-            sphere_radius = self.radii[index]
-            view.shape.add_sphere(list(sphere_coordinates), [0.8,0.8,0.8], sphere_radius)
+            sphere_coordinates_value = puw.get_value(self.centers[index,:])
+            sphere_radius_value = puw.get_value(self.radii[index])
+            view.shape.add_sphere(list(sphere_coordinates_value), sphere_color, sphere_radius_value)
 
         return view
 
